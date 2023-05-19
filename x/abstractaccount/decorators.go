@@ -155,33 +155,33 @@ func (d AfterTxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate, succe
 
 // ---------------------------------- Helpers ----------------------------------
 
-func isAbstractAccountTx(ctx sdk.Context, tx sdk.Tx, ak authkeeper.AccountKeeper) (bool, *types.AbstractAccount, txsigning.SignatureV2, error) {
+func isAbstractAccountTx(ctx sdk.Context, tx sdk.Tx, ak authkeeper.AccountKeeper) (bool, *types.AbstractAccount, *txsigning.SignatureV2, error) {
 	sigTx, ok := tx.(authsigning.SigVerifiableTx)
 	if !ok {
-		return false, nil, txsigning.SignatureV2{}, errors.Wrap(sdkerrors.ErrTxDecode, "tx is not a SigVerifiableTx")
+		return false, nil, nil, errors.Wrap(sdkerrors.ErrTxDecode, "tx is not a SigVerifiableTx")
 	}
 
 	sigs, err := sigTx.GetSignaturesV2()
 	if err != nil {
-		return false, nil, txsigning.SignatureV2{}, err
+		return false, nil, nil, err
 	}
 
 	signerAddrs := sigTx.GetSigners()
 	if len(signerAddrs) != 1 || len(sigs) != 1 {
-		return false, nil, txsigning.SignatureV2{}, nil
+		return false, nil, nil, nil
 	}
 
 	signerAcc, err := authante.GetSignerAcc(ctx, ak, signerAddrs[0])
 	if err != nil {
-		return false, nil, txsigning.SignatureV2{}, err
+		return false, nil, nil, err
 	}
 
 	absAcc, ok := signerAcc.(*types.AbstractAccount)
 	if !ok {
-		return false, nil, txsigning.SignatureV2{}, nil
+		return false, nil, nil, nil
 	}
 
-	return true, absAcc, sigs[0], nil
+	return true, absAcc, &sigs[0], nil
 }
 
 func prepareCredentials(
