@@ -1,0 +1,37 @@
+syntax = "proto3";
+package abstractaccount.v1beta1;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/larry0x/abstract-account/x/abstractaccount/types";
+
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // Register a new abstract account by instantiating a new CosmWasm smart
+  // contract.
+  rpc RegisterAccount(MsgRegisterAccount) returns (MsgRegisterAccountResponse);
+}
+
+message MsgRegisterAccount {
+  option (cosmos.msg.v1.signer)      = "sender";
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string                            sender  = 1;
+  uint64                            code_id = 2 [(gogoproto.customname) = "CodeID"];
+  bytes                             msg     = 3 [
+    (gogoproto.casttype) = "github.com/CosmWasm/wasmd/x/wasm/types.RawContractMessage"
+  ];
+  repeated cosmos.base.v1beta1.Coin funds   = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+message MsgRegisterAccountResponse {
+  string address = 1;
+  bytes  data    = 2;
+}

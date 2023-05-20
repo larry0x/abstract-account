@@ -1,0 +1,8 @@
+syntax = "proto3";
+package abstractaccount.v1beta1;
+
+option go_package = "github.com/larry0x/abstract-account/x/abstractaccount/types";
+
+message GenesisState {
+  // nothing to see here
+}

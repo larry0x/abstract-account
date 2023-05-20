@@ -1,5 +1,4 @@
 syntax = "proto3";
-
 package abstractaccount.v1beta1;
 
 import "cosmos/auth/v1beta1/auth.proto";
