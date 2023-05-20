@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	_ sdk.AnteDecorator = (*BeforeTxDecorator)(nil)
-	_ sdk.PostDecorator = (*AfterTxDecorator)(nil)
+	_ sdk.AnteDecorator = &BeforeTxDecorator{}
+	_ sdk.PostDecorator = &AfterTxDecorator{}
 )
 
 // --------------------------------- BeforeTx ----------------------------------

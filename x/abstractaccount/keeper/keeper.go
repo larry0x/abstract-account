@@ -8,17 +8,23 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
 	"github.com/larry0x/abstract-account/x/abstractaccount/types"
 )
 
 type Keeper struct {
-	cdc           codec.BinaryCodec
-	storeKey      storetypes.StoreKey
-	accountKeeper authkeeper.AccountKeeperI
+	cdc      codec.BinaryCodec
+	storeKey storetypes.StoreKey
+	ak       authkeeper.AccountKeeperI
+	ck       wasmtypes.ContractOpsKeeper
 }
 
-func NewKeeper(cdc codec.BinaryCodec, storeKey storetypes.StoreKey, accountKeeper authkeeper.AccountKeeperI) Keeper {
-	return Keeper{cdc, storeKey, accountKeeper}
+func NewKeeper(
+	cdc codec.BinaryCodec, storeKey storetypes.StoreKey,
+	ak authkeeper.AccountKeeperI, ck wasmtypes.ContractOpsKeeper,
+) Keeper {
+	return Keeper{cdc, storeKey, ak, ck}
 }
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
