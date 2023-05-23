@@ -41,7 +41,15 @@ pub fn after_tx() -> ContractResult<Response> {
         .add_attribute("method", "after_tx"))
 }
 
-pub fn update_pubkey(store: &mut dyn Storage, new_pubkey: &Binary) -> ContractResult<Response> {
+pub fn update_pubkey(
+    store: &mut dyn Storage,
+    sender: &Addr,
+    contract: &Addr,
+    new_pubkey: &Binary,
+) -> ContractResult<Response> {
+    // only the account itself can update its pubkey
+    assert_self(sender, contract)?;
+
     PUBKEY.save(store, new_pubkey)?;
 
     Ok(Response::new()
@@ -49,7 +57,7 @@ pub fn update_pubkey(store: &mut dyn Storage, new_pubkey: &Binary) -> ContractRe
         .add_attribute("new_pubkey", new_pubkey.to_base64()))
 }
 
-pub fn assert_self(sender: &Addr, contract: &Addr) -> ContractResult<()> {
+fn assert_self(sender: &Addr, contract: &Addr) -> ContractResult<()> {
     if sender != contract {
         return Err(ContractError::Unauthorized);
     }
@@ -57,7 +65,7 @@ pub fn assert_self(sender: &Addr, contract: &Addr) -> ContractResult<()> {
     Ok(())
 }
 
-pub fn sha256(msg: &[u8]) -> Vec<u8> {
+fn sha256(msg: &[u8]) -> Vec<u8> {
     let mut hasher = Sha256::new();
     hasher.update(msg);
     hasher.finalize().to_vec()

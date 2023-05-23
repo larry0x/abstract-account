@@ -1,5 +1,5 @@
 [package]
-name          = "account-key-rotation"
+name          = "account-updatable"
 description   = "An abstract account that allows rotating the pubkey associated with it"
 version       = { workspace = true }
 rust-version  = { workspace = true }

@@ -48,10 +48,7 @@ pub fn execute(
     match msg {
         ExecuteMsg::UpdatePubkey {
             new_pubkey,
-        } => {
-            execute::assert_self(&info.sender, &env.contract.address)?;
-            execute::update_pubkey(deps.storage, &new_pubkey)
-        },
+        } => execute::update_pubkey(deps.storage, &info.sender, &env.contract.address, &new_pubkey),
     }
 }
 
