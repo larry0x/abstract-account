@@ -16,6 +16,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
+	"github.com/larry0x/abstract-account/x/abstractaccount/client/cli"
 	"github.com/larry0x/abstract-account/x/abstractaccount/keeper"
 	"github.com/larry0x/abstract-account/x/abstractaccount/types"
 )
@@ -54,7 +55,7 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 }
 
 func (AppModuleBasic) GetTxCmd() *cobra.Command {
-	return nil //TODO
+	return cli.GetTxCmd()
 }
 
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
