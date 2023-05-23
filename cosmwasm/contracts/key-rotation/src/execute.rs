@@ -42,7 +42,7 @@ pub fn after_tx() -> ContractResult<Response> {
 }
 
 pub fn update_pubkey(store: &mut dyn Storage, new_pubkey: &Binary) -> ContractResult<Response> {
-    PUBKEY.save(store, &new_pubkey)?;
+    PUBKEY.save(store, new_pubkey)?;
 
     Ok(Response::new()
         .add_attribute("method", "update_pubkey")
