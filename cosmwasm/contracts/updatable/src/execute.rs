@@ -20,15 +20,15 @@ pub fn before_tx(
     sign_bytes: &Binary,
     signature: &Binary,
 ) -> ContractResult<Response> {
+    let sign_bytes_hash = sha256(sign_bytes);
     let self_pubkey = PUBKEY.load(deps.storage)?;
+    let pubkey = pubkey.unwrap_or(&self_pubkey);
 
-    if let Some(pubkey) = pubkey {
-        if *pubkey != self_pubkey {
-            return Err(ContractError::PubKeyMismatch);
-        }
+    if *pubkey != self_pubkey {
+        return Err(ContractError::PubKeyMismatch);
     }
 
-    if !deps.api.secp256k1_verify(&sha256(sign_bytes), signature, &self_pubkey)? {
+    if !deps.api.secp256k1_verify(&sign_bytes_hash, signature, &self_pubkey)? {
         return Err(ContractError::InvalidSignature);
     }
 
