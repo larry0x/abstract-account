@@ -10,7 +10,7 @@ pub fn init(store: &mut dyn Storage, pubkey: &Binary) -> ContractResult<Response
     PUBKEY.save(store, pubkey)?;
 
     Ok(Response::new()
-        .add_attribute("method", "instantiate")
+        .add_attribute("method", "init")
         .add_attribute("pubkey", pubkey.to_base64()))
 }
 
