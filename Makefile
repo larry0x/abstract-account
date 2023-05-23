@@ -6,11 +6,7 @@ DOCKER := $(shell which docker)
 BUILDDIR ?= $(CURDIR)/build
 LEDGER_ENABLED ?= true
 
-# ********** Golang configs **********
-
-export GO111MODULE = on
-
-# ********** process build tags **********
+# ----------------------------- process build tags -----------------------------
 
 build_tags = netgo
 ifeq ($(LEDGER_ENABLED),true)
@@ -49,10 +45,10 @@ whitespace := $(whitespace) $(whitespace)
 comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
-# ********** process linker flags **********
+# ---------------------------- process linker flags ----------------------------
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=abstract-account \
-          -X github.com/cosmos/cosmos-sdk/version.AppName=aad \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=simapp \
+          -X github.com/cosmos/cosmos-sdk/version.AppName=simd \
           -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
           -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
           -X github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)
@@ -77,52 +73,16 @@ ifeq (,$(findstring nostrip,$(MARS_BUILD_OPTIONS)))
 	BUILD_FLAGS += -trimpath
 endif
 
-all: proto-gen lint test install
-
 ################################################################################
 ###                                  Build                                   ###
 ################################################################################
 
-install: enforce-go-version
-	@echo "🤖 Installing aad..."
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/aad
+install:
+	@echo "🤖 Installing simapp..."
+	go install -mod=readonly $(BUILD_FLAGS) ./simapp/simd
 	@echo "✅ Completed installation!"
 
-build: enforce-go-version
-	@echo "🤖 Building aad..."
-	go build $(BUILD_FLAGS) -o $(BUILDDIR)/ ./cmd/aad
+build:
+	@echo "🤖 Building simapp..."
+	go build $(BUILD_FLAGS) -o $(BUILDDIR)/ ./simapp/simd
 	@echo "✅ Completed build!"
-
-################################################################################
-###                                  Tests                                   ###
-################################################################################
-
-test:
-	@echo "🤖 Running tests..."
-	go test -mod=readonly ./x/...
-	@echo "✅ Completed tests!"
-
-################################################################################
-###                                 Protobuf                                 ###
-################################################################################
-
-protoVer=0.11.6
-protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
-containerProtoGenGo=aa-proto-gen-go-$(protoVer)
-
-proto-go-gen:
-	@echo "🤖 Generating Go code from protobuf..."
-	@if docker ps -a --format '{{.Names}}' | grep -Eq "^${containerProtoGenGo}$$"; then docker start -a $(containerProtoGenGo); else docker run --name $(containerProtoGenGo) -v $(CURDIR):/workspace --workdir /workspace $(protoImageName) \
-		sh ./scripts/protocgen.sh; fi
-	@echo "✅ Completed Go code generation!"
-
-################################################################################
-###                                 Linting                                  ###
-################################################################################
-
-golangci_lint_cmd=github.com/golangci/golangci-lint/cmd/golangci-lint
-
-lint:
-	@echo "🤖 Running linter..."
-	go run $(golangci_lint_cmd) run --timeout=10m
-	@echo "✅ Completed linting!"

@@ -10,7 +10,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	txsigning "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -30,13 +29,13 @@ var (
 
 type BeforeTxDecorator struct {
 	aak             keeper.Keeper
-	ak              authkeeper.AccountKeeper
+	ak              authante.AccountKeeper
 	ck              wasmtypes.ContractOpsKeeper
 	signModeHandler authsigning.SignModeHandler
 }
 
 func NewBeforeTxDecorator(
-	aak keeper.Keeper, ak authkeeper.AccountKeeper,
+	aak keeper.Keeper, ak authante.AccountKeeper,
 	ck wasmtypes.ContractOpsKeeper, signModeHandler authsigning.SignModeHandler,
 ) BeforeTxDecorator {
 	return BeforeTxDecorator{aak, ak, ck, signModeHandler}
@@ -116,11 +115,11 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 
 type AfterTxDecorator struct {
 	aak keeper.Keeper
-	ak  authkeeper.AccountKeeper
+	ak  authante.AccountKeeper
 	ck  wasmtypes.ContractOpsKeeper
 }
 
-func NewAfterTxDecorator(aak keeper.Keeper, ak authkeeper.AccountKeeper, ck wasmtypes.ContractOpsKeeper) AfterTxDecorator {
+func NewAfterTxDecorator(aak keeper.Keeper, ak authante.AccountKeeper, ck wasmtypes.ContractOpsKeeper) AfterTxDecorator {
 	return AfterTxDecorator{aak, ak, ck}
 }
 
@@ -159,7 +158,7 @@ func (d AfterTxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate, succe
 
 // ---------------------------------- Helpers ----------------------------------
 
-func isAbstractAccountTx(ctx sdk.Context, tx sdk.Tx, ak authkeeper.AccountKeeper) (bool, *types.AbstractAccount, *txsigning.SignatureV2, error) {
+func isAbstractAccountTx(ctx sdk.Context, tx sdk.Tx, ak authante.AccountKeeper) (bool, *types.AbstractAccount, *txsigning.SignatureV2, error) {
 	sigTx, ok := tx.(authsigning.SigVerifiableTx)
 	if !ok {
 		return false, nil, nil, errors.Wrap(sdkerrors.ErrTxDecode, "tx is not a SigVerifiableTx")
