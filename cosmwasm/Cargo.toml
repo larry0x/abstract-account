@@ -1,0 +1,31 @@
+[workspace]
+members = ["contracts/*", "packages/*"]
+
+[workspace.package]
+version       = "0.0.0"
+authors       = ["larry <gm@larry.engineer>"]
+edition       = "2021"
+rust-version  = "1.68.0"
+license       = "TBD"
+homepage      = "https://larry.engineer"
+repository    = "https://github.com/larry0x/abstract-account"
+documentation = "https://github.com/larry0x/abstract-account#readme"
+keywords      = ["blockchain", "cosmos", "cosmwasm", "account-abstraction"]
+
+[workspace.dependencies]
+cosmwasm-schema = "1.2"
+cosmwasm-std    = { version = "1.2", features = ["stargate"] }
+cw2             = "1.0"
+cw-storage-plus = "1"
+sha2            = "0.10"
+thiserror       = "1"
+
+[profile.release]
+codegen-units    = 1
+debug            = false
+debug-assertions = false
+incremental      = false
+lto              = true
+opt-level        = 3
+overflow-checks  = true
+rpath            = false

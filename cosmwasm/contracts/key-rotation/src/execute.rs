@@ -1,0 +1,64 @@
+use cosmwasm_std::{Addr, Binary, Deps, Response, Storage};
+use sha2::{Digest, Sha256};
+
+use crate::{
+    error::{ContractError, ContractResult},
+    state::PUBKEY,
+};
+
+pub fn init(store: &mut dyn Storage, pubkey: &Binary) -> ContractResult<Response> {
+    PUBKEY.save(store, pubkey)?;
+
+    Ok(Response::new()
+        .add_attribute("method", "instantiate")
+        .add_attribute("pubkey", pubkey.to_base64()))
+}
+
+pub fn before_tx(
+    deps: Deps,
+    pubkey: Option<&Binary>,
+    sign_bytes: &Binary,
+    signature: &Binary,
+) -> ContractResult<Response> {
+    let self_pubkey = PUBKEY.load(deps.storage)?;
+
+    if let Some(pubkey) = pubkey {
+        if *pubkey != self_pubkey {
+            return Err(ContractError::PubKeyMismatch);
+        }
+    }
+
+    if !deps.api.secp256k1_verify(&sha256(sign_bytes), signature, &self_pubkey)? {
+        return Err(ContractError::InvalidSignature);
+    }
+
+    Ok(Response::new()
+        .add_attribute("method", "before_tx"))
+}
+
+pub fn after_tx() -> ContractResult<Response> {
+    Ok(Response::new()
+        .add_attribute("method", "after_tx"))
+}
+
+pub fn update_pubkey(store: &mut dyn Storage, new_pubkey: &Binary) -> ContractResult<Response> {
+    PUBKEY.save(store, &new_pubkey)?;
+
+    Ok(Response::new()
+        .add_attribute("method", "update_pubkey")
+        .add_attribute("new_pubkey", new_pubkey.to_base64()))
+}
+
+pub fn assert_self(sender: &Addr, contract: &Addr) -> ContractResult<()> {
+    if sender != contract {
+        return Err(ContractError::Unauthorized);
+    }
+
+    Ok(())
+}
+
+pub fn sha256(msg: &[u8]) -> Vec<u8> {
+    let mut hasher = Sha256::new();
+    hasher.update(msg);
+    hasher.finalize().to_vec()
+}

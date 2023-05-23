@@ -1,0 +1,7 @@
+# https://rust-lang.github.io/rustfmt
+format_code_in_doc_comments = true               # nightly
+group_imports               = "StdExternalCrate" # nightly
+imports_granularity         = "Crate"            # nightly
+match_block_trailing_comma  = true
+max_width                   = 100
+use_small_heuristics        = "off"

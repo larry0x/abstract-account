@@ -1,0 +1,16 @@
+[package]
+name          = "abstract-account"
+description   = "Types and macros used for creating abstract account contracts"
+version       = { workspace = true }
+rust-version  = { workspace = true }
+authors       = { workspace = true }
+edition       = { workspace = true }
+license       = { workspace = true }
+homepage      = { workspace = true }
+repository    = { workspace = true }
+documentation = { workspace = true }
+keywords      = { workspace = true }
+
+[dependencies]
+cosmwasm-schema = { workspace = true }
+cosmwasm-std    = { workspace = true }
