@@ -80,9 +80,12 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 		return ctx, err
 	}
 
-	// Then let us the prepare the sign bytes and signature. Logics here are
-	// mostly copied over from the SigVerificationDecorator.
-	signBytes, sigBytes, err := prepareCredentials(ctx, tx, signerAcc, sig.Data, d.signModeHandler)
+	// Then let us the prepare the tx credentials, which will be provided to the
+	// contract to be verified. This includes the pubkey (may be nil), signBytes,
+	// and the signature.
+	//
+	// Logics here are mostly copied over from the SigVerificationDecorator.
+	pubKeyBytes, signBytes, sigBytes, err := prepareCredentials(ctx, tx, signerAcc, sig.Data, d.signModeHandler)
 	if err != nil {
 		return ctx, err
 	}
@@ -91,6 +94,7 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 	sudoMsgBytes, err := json.Marshal(&types.AccountSudoMsg{
 		BeforeTx: &types.BeforeTx{
 			Msgs:      stargateMsgs,
+			PubKey:    pubKeyBytes,
 			SignBytes: signBytes,
 			Signature: sigBytes,
 		},
@@ -187,7 +191,7 @@ func isAbstractAccountTx(ctx sdk.Context, tx sdk.Tx, ak authkeeper.AccountKeeper
 func prepareCredentials(
 	ctx sdk.Context, tx sdk.Tx, signerAcc authtypes.AccountI,
 	sigData txsigning.SignatureData, handler authsigning.SignModeHandler,
-) ([]byte, []byte, error) {
+) ([]byte, []byte, []byte, error) {
 	signerData := authsigning.SignerData{
 		Address:       signerAcc.GetAddress().String(),
 		ChainID:       ctx.ChainID(),
@@ -198,15 +202,15 @@ func prepareCredentials(
 
 	data, ok := sigData.(*txsigning.SingleSignatureData)
 	if !ok {
-		return nil, nil, types.ErrNotSingleSignautre
+		return nil, nil, nil, types.ErrNotSingleSignautre
 	}
 
 	signBytes, err := handler.GetSignBytes(data.SignMode, signerData, tx)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	return signBytes, data.Signature, nil
+	return signerAcc.GetPubKey().Bytes(), signBytes, data.Signature, nil
 }
 
 func sdkMsgsToStargateMsgs(msgs []sdk.Msg) ([]wasmvmtypes.StargateMsg, error) {

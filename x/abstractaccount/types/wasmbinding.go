@@ -9,6 +9,7 @@ type AccountSudoMsg struct {
 
 type BeforeTx struct {
 	Msgs      []wasmvmtypes.StargateMsg `json:"msgs"`
+	PubKey    []byte                    `json:"pubkey"`
 	SignBytes []byte                    `json:"sign_bytes"`
 	Signature []byte                    `json:"signature"`
 }
