@@ -26,8 +26,10 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// Abstract Account defines a smart contract that is capable of initiating txs.
-// It is similar to BaseAccount except for it doesn't have a pubkey.
+// AbstractAccount is a smart contract that is capable of initiating txs.
+//
+// This account type is similar to BaseAccount except for it doesn't have a
+// pubkey. If a pubkey is needed, it creates and returns a new NilPubKey.
 type AbstractAccount struct {
 	Address       string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 	AccountNumber uint64 `protobuf:"varint,2,opt,name=account_number,json=accountNumber,proto3" json:"account_number,omitempty"`
@@ -67,13 +69,12 @@ func (m *AbstractAccount) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_AbstractAccount proto.InternalMessageInfo
 
-// NilPubKey is the pubkey type of the AbstractAccount. Basically, it is a
-// pubkey that doesn't exist.
+// NilPubKey is the pubkey type of the AbstractAccount. Basically, it represents
+// a pubkey that doesn't exist.
 //
 // The actual pubkey of an AbstractAccount (if it has one) is to be stored
 // inside the contract, not at the SDK level. Signature verification is also
-// performed inside the contract, typically in the BeforeTx hook. Therefore, the
-// pubkey in the BaseAccount should be a special nil type.
+// done inside the contract, typically in the BeforeTx hook.
 type NilPubKey struct {
 	AddressBytes []byte `protobuf:"bytes,1,opt,name=address_bytes,json=addressBytes,proto3" json:"address_bytes,omitempty"`
 }

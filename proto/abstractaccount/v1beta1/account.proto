@@ -8,8 +8,10 @@ import "google/protobuf/any.proto";
 
 option go_package = "github.com/larry0x/abstract-account/x/abstractaccount/types";
 
-// Abstract Account defines a smart contract that is capable of initiating txs.
-// It is similar to BaseAccount except for it doesn't have a pubkey.
+// AbstractAccount is a smart contract that is capable of initiating txs.
+//
+// This account type is similar to BaseAccount except for it doesn't have a
+// pubkey. If a pubkey is needed, it creates and returns a new NilPubKey.
 message AbstractAccount {
   option (gogoproto.goproto_getters)         = false;
   option (gogoproto.equal)                   = false;
@@ -20,13 +22,12 @@ message AbstractAccount {
   uint64 sequence       = 3;
 }
 
-// NilPubKey is the pubkey type of the AbstractAccount. Basically, it is a
-// pubkey that doesn't exist.
+// NilPubKey is the pubkey type of the AbstractAccount. Basically, it represents
+// a pubkey that doesn't exist.
 //
 // The actual pubkey of an AbstractAccount (if it has one) is to be stored
 // inside the contract, not at the SDK level. Signature verification is also
-// performed inside the contract, typically in the BeforeTx hook. Therefore, the
-// pubkey in the BaseAccount should be a special nil type.
+// done inside the contract, typically in the BeforeTx hook.
 message NilPubKey {
   option (gogoproto.goproto_stringer) = false;
 
