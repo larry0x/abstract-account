@@ -7,6 +7,9 @@ build/
 # rust
 **/target/
 
+# testing
+testdata/
+
 # editors
 .idea/
 .vscode/
