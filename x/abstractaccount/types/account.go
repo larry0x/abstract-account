@@ -84,7 +84,7 @@ func (pk *NilPubKey) Address() cryptotypes.Address {
 }
 
 func (pk *NilPubKey) Bytes() []byte {
-	return []byte{}
+	return nil
 }
 
 func (pk *NilPubKey) VerifySignature(msg []byte, sig []byte) bool {
