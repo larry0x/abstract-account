@@ -64,7 +64,7 @@ func NewAnteHandler(options AnteHandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewSetPubKeyDecorator(options.AccountKeeper),
 		ante.NewValidateSigCountDecorator(options.AccountKeeper),
 		ante.NewSigGasConsumeDecorator(options.AccountKeeper, options.SigGasConsumer),
-		// BeforeTxKeeper replaces the default NewSigVerificationDecorator
+		// BeforeTxDecorator replaces the default NewSigVerificationDecorator
 		abstractaccount.NewBeforeTxDecorator(
 			options.AbstractAccountKeeper,
 			options.AccountKeeper,
