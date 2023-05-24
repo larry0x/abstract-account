@@ -141,6 +141,21 @@ while also skips the address check.
 				return err
 			}
 
+			sigData := txsigning.SingleSignatureData{
+				SignMode:  txf.SignMode(),
+				Signature: nil,
+			}
+
+			sig := txsigning.SignatureV2{
+				PubKey:   signerAcc.GetPubKey(),
+				Data:     &sigData,
+				Sequence: txf.Sequence(),
+			}
+
+			if err := txBuilder.SetSignatures(sig); err != nil {
+				return err
+			}
+
 			signBytes, err := clientCtx.TxConfig.SignModeHandler().GetSignBytes(txf.SignMode(), signerData, txBuilder.GetTx())
 			if err != nil {
 				return err
@@ -156,12 +171,12 @@ while also skips the address check.
 				return err
 			}
 
-			sigData := txsigning.SingleSignatureData{
+			sigData = txsigning.SingleSignatureData{
 				SignMode:  txf.SignMode(),
 				Signature: sigBytes,
 			}
 
-			sig := txsigning.SignatureV2{
+			sig = txsigning.SignatureV2{
 				PubKey:   signerAcc.GetPubKey(),
 				Data:     &sigData,
 				Sequence: txf.Sequence(),
