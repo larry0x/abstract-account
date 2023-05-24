@@ -2,10 +2,10 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/larry0x/abstract-account/x/abstractaccount/types"
 )
@@ -32,7 +32,7 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 		senderAddr,
 		senderAddr,
 		req.Msg,
-		types.AccountLabel(req.Sender, req.CodeID),
+		accountLabel(req.Sender, req.CodeID),
 		req.Funds,
 	)
 	if err != nil {
@@ -42,12 +42,7 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 	// The previous contract instantiation should have created a BaseAccount.
 	// We wrap this BaseAccount in our AbstractAccount type and overwrite it.
 	acc := ms.k.ak.GetAccount(ctx, contractAddr)
-	baseAcc, ok := acc.(*authtypes.BaseAccount)
-	if !ok {
-		return nil, types.ErrNotBaseAccount
-	}
-
-	ms.k.ak.SetAccount(ctx, &types.AbstractAccount{BaseAccount: baseAcc})
+	ms.k.ak.SetAccount(ctx, types.NewAbstractAccount(acc.GetAddress().String(), acc.GetAccountNumber(), acc.GetSequence()))
 
 	ms.k.Logger(ctx).Info(
 		"abstract account registered",
@@ -66,4 +61,13 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 	)
 
 	return &types.MsgRegisterAccountResponse{Address: contractAddr.String(), Data: data}, nil
+}
+
+func accountLabel(sender string, codeID uint64) string {
+	// Ideally we have a unique label for each abstract account. The current one
+	// obvious isn't unique.
+	//
+	// An option is `abstractaccount/blockHeight/txIndex/msgIndex` but I haven't
+	// figured how to determine the txIndex and msgIndex yet.
+	return fmt.Sprintf("abstractaccount/%s/%d", sender, codeID)
 }

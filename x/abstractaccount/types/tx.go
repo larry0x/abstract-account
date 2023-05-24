@@ -2,23 +2,29 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 var _ sdk.Msg = &MsgRegisterAccount{}
 
 func (m *MsgRegisterAccount) ValidateBasic() error {
-	msg := wasmtypes.MsgInstantiateContract{
-		Sender: m.Sender,
-		Admin:  m.Sender,
-		CodeID: m.CodeID,
-		Label:  AccountLabel(m.Sender, m.CodeID),
-		Msg:    m.Msg,
-		Funds:  m.Funds,
+	if _, err := sdk.AccAddressFromBech32(m.Sender); err != nil {
+		return sdkerrors.ErrInvalidRequest.Wrap("invalid sender address")
 	}
 
-	return msg.ValidateBasic()
+	if m.CodeID == 0 {
+		return sdkerrors.ErrInvalidRequest.Wrap("code id cannot be zero")
+	}
+
+	if err := m.Msg.ValidateBasic(); err != nil {
+		return sdkerrors.ErrInvalidRequest.Wrapf("invalid init msg: %s", err.Error())
+	}
+
+	if !m.Funds.IsValid() {
+		return sdkerrors.ErrInvalidCoins
+	}
+
+	return nil
 }
 
 func (m *MsgRegisterAccount) GetSigners() []sdk.AccAddress {
