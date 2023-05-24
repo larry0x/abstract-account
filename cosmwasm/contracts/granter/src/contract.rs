@@ -28,16 +28,14 @@ pub fn sudo(deps: DepsMut, env: Env, msg: AccountSudoMsg) -> ContractResult<Resp
     match msg {
         AccountSudoMsg::BeforeTx {
             msgs,
-            pubkey,
             sign_bytes,
-            signature,
+            credential,
         } => execute::before_tx(
             deps.as_ref(),
             &env.block,
             &msgs,
-            pubkey.as_ref(),
             &sign_bytes,
-            &signature,
+            &credential,
         ),
         AccountSudoMsg::AfterTx {
             ..

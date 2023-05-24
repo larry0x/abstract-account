@@ -1,6 +1,11 @@
 package types
 
-import wasmvmtypes "github.com/CosmWasm/wasmvm/types"
+import "github.com/cosmos/gogoproto/proto"
+
+type Any struct {
+	TypeURL string `json:"type_url"`
+	Value   []byte `json:"value"`
+}
 
 type AccountSudoMsg struct {
 	BeforeTx *BeforeTx `json:"before_tx,omitempty"`
@@ -8,12 +13,25 @@ type AccountSudoMsg struct {
 }
 
 type BeforeTx struct {
-	Msgs      []wasmvmtypes.StargateMsg `json:"msgs"`
-	PubKey    []byte                    `json:"pubkey"`
-	SignBytes []byte                    `json:"sign_bytes"`
-	Signature []byte                    `json:"signature"`
+	Msgs       []*Any `json:"msgs"`
+	SignBytes  []byte `json:"sign_bytes"`
+	Credential []byte `json:"credential"`
 }
 
 type AfterTx struct {
 	Success bool `json:"success"`
+}
+
+func NewAnyFromProtoMsg(msg proto.Message) (*Any, error) {
+	bz, err := proto.Marshal(msg)
+	if err != nil {
+		return nil, err
+	}
+
+	any := &Any{
+		TypeURL: "/" + proto.MessageName(msg),
+		Value:   bz,
+	}
+
+	return any, nil
 }

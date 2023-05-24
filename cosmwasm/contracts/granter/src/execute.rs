@@ -1,11 +1,12 @@
-use abstract_account::StargateMsg;
-use cosmwasm_std::{Addr, Binary, Deps, Response, Storage, DepsMut, Env, MessageInfo, BlockInfo};
+use abstract_account::Any;
+use cosmwasm_std::{Addr, Binary, Deps, Response, Storage, DepsMut, Env, MessageInfo, BlockInfo, from_binary};
 use cw_utils::Expiration;
 use sha2::{Digest, Sha256};
 
 use crate::{
     error::{ContractError, ContractResult},
-    state::{PUBKEY, GRANTS}, msg::Grant,
+    msg::{Credential, Grant},
+    state::{PUBKEY, GRANTS},
 };
 
 pub fn init(store: &mut dyn Storage, pubkey: &Binary) -> ContractResult<Response> {
@@ -19,20 +20,24 @@ pub fn init(store: &mut dyn Storage, pubkey: &Binary) -> ContractResult<Response
 pub fn before_tx(
     deps: Deps,
     block: &BlockInfo,
-    msgs: &[StargateMsg],
-    pubkey: Option<&Binary>,
+    msgs: &[Any],
     sign_bytes: &Binary,
-    signature: &Binary,
+    credential_bytes: &Binary,
 ) -> ContractResult<Response> {
     let sign_bytes_hash = sha256(sign_bytes);
-    let self_pubkey = PUBKEY.load(deps.storage)?;
-    let pubkey = pubkey.unwrap_or(&self_pubkey);
+    let pubkey = PUBKEY.load(deps.storage)?;
 
-    if *pubkey != self_pubkey {
-        assert_has_grant(deps.storage, block, msgs, pubkey)?;
+    let credential: Credential = from_binary(credential_bytes)?;
+
+    // if the signature is signed by the account's own pubkey, the simply move
+    // on to verify the signature
+    // if it's signed by another pubkey, we need to make sure that this pubkey
+    // has, for each message involved, a non-expired grant to send it
+    if credential.pubkey != pubkey {
+        assert_has_grant(deps.storage, block, msgs, &credential.pubkey)?;
     }
 
-    if !deps.api.secp256k1_verify(&sign_bytes_hash, signature, pubkey)? {
+    if !deps.api.secp256k1_verify(&sign_bytes_hash, &credential.signature, &credential.pubkey)? {
         return Err(ContractError::InvalidSignature);
     }
 
@@ -94,7 +99,7 @@ pub fn revoke(
 fn assert_has_grant(
     store: &dyn Storage,
     block: &BlockInfo,
-    msgs: &[StargateMsg],
+    msgs: &[Any],
     grantee: &Binary,
 ) -> ContractResult<()> {
     for msg in msgs {

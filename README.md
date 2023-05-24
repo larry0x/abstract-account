@@ -37,9 +37,8 @@ In order to achieve this, the SCA must implement [two sudo methods][4], `before_
 enum SudoMsg {
   BeforeTx {
     msgs:       Vec<Any>,
-    pubkey:     Any,
     sign_bytes: Binary,
-    signature:  Binary,
+    credential: Binary,
   },
   AfterTx {
     success: bool,

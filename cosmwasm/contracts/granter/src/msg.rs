@@ -8,6 +8,12 @@ pub struct Grant {
 }
 
 #[cw_serde]
+pub struct Credential {
+    pub pubkey:    Binary,
+    pub signature: Binary,
+}
+
+#[cw_serde]
 pub struct InstantiateMsg {
     pub pubkey: Binary,
 }

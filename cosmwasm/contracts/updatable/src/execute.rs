@@ -16,17 +16,11 @@ pub fn init(store: &mut dyn Storage, pubkey: &Binary) -> ContractResult<Response
 
 pub fn before_tx(
     deps: Deps,
-    pubkey: Option<&Binary>,
     sign_bytes: &Binary,
     signature: &Binary,
 ) -> ContractResult<Response> {
     let sign_bytes_hash = sha256(sign_bytes);
     let self_pubkey = PUBKEY.load(deps.storage)?;
-    let pubkey = pubkey.unwrap_or(&self_pubkey);
-
-    if *pubkey != self_pubkey {
-        return Err(ContractError::PubKeyMismatch);
-    }
 
     if !deps.api.secp256k1_verify(&sign_bytes_hash, signature, &self_pubkey)? {
         return Err(ContractError::InvalidSignature);

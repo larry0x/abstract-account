@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"cosmossdk.io/errors"
-	"github.com/cosmos/gogoproto/proto"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -14,7 +13,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 
 	keeper "github.com/larry0x/abstract-account/x/abstractaccount/keeper"
 	types "github.com/larry0x/abstract-account/x/abstractaccount/types"
@@ -85,40 +83,44 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 	// Now that we've determined the tx is an AA tx, let us prepare the SudoMsg
 	// that will be used to invoke the account contract. The msg includes:
 	//
-	// - The messages in the tx, converted to cosmwasm_std::StargateMsg format
+	// - The messages in the tx, converted to []Any
 	// - The sign bytes
-	// - The signature
+	// - The credential
 	//
 	// Firstly let's prepare the messages.
-	stargateMsgs, err := sdkMsgsToStargateMsgs(tx.GetMsgs())
+	msgAnys, err := sdkMsgsToAnys(tx.GetMsgs())
 	if err != nil {
 		return ctx, err
 	}
 
-	// Then let us the prepare the tx credentials, which will be provided to the
-	// contract to be verified. This includes the pubkey (may be nil), signBytes,
-	// and the signature.
-	//
+	// Then let us the prepare the sign bytes and credentiale.
 	// Logics here are mostly copied over from the SigVerificationDecorator.
-	pubKeyBytes, signBytes, sigBytes, err := prepareCredentials(ctx, tx, signerAcc, sig.Data, d.signModeHandler)
+	signBytes, sigBytes, err := prepareCredentials(ctx, tx, signerAcc, sig.Data, d.signModeHandler)
 	if err != nil {
 		return ctx, err
 	}
 
-	// Assemble the SudoMsg and serialize it into a JSON string
 	sudoMsgBytes, err := json.Marshal(&types.AccountSudoMsg{
 		BeforeTx: &types.BeforeTx{
-			Msgs:      stargateMsgs,
-			PubKey:    pubKeyBytes,
+			Msgs:      msgAnys,
 			SignBytes: signBytes,
-			Signature: sigBytes,
+			// Note that we call this field "credential" instead of signature. There
+			// is an important reason for this!
+			//
+			// For EOAs, the credential used to prove a tx is authenticated is a
+			// cryptographic signature. For AbstractAccounts however, this is not
+			// necessarily the case. The account contract can be programmed to take
+			// any credential, not limited to cryptographic signatures. An example of
+			// this can be a zk proof that the sender has undergone certain KYC
+			// procedures. Therefore, instead of calling this "signature", we choose a
+			// more generalized term: credentials.
+			Credential: sigBytes,
 		},
 	})
 	if err != nil {
 		return ctx, err
 	}
 
-	// Call the contract
 	_, err = d.ck.Sudo(ctx, signerAcc.GetAddress(), sudoMsgBytes)
 	if err != nil {
 		return ctx, err
@@ -153,7 +155,6 @@ func (d AfterTxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate, succe
 		return next(ctx, tx, simulate, success)
 	}
 
-	// Prepare the SudoMsg
 	sudoMsgBytes, err := json.Marshal(&types.AccountSudoMsg{
 		AfterTx: &types.AfterTx{
 			Success: success,
@@ -163,7 +164,6 @@ func (d AfterTxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate, succe
 		return ctx, err
 	}
 
-	// Call the contract
 	_, err = d.ck.Sudo(ctx, signerAddr, sudoMsgBytes)
 	if err != nil {
 		return ctx, err
@@ -206,7 +206,7 @@ func isAbstractAccountTx(ctx sdk.Context, tx sdk.Tx, ak authante.AccountKeeper) 
 func prepareCredentials(
 	ctx sdk.Context, tx sdk.Tx, signerAcc authtypes.AccountI,
 	sigData txsigning.SignatureData, handler authsigning.SignModeHandler,
-) ([]byte, []byte, []byte, error) {
+) ([]byte, []byte, error) {
 	signerData := authsigning.SignerData{
 		Address:       signerAcc.GetAddress().String(),
 		ChainID:       ctx.ChainID(),
@@ -217,33 +217,28 @@ func prepareCredentials(
 
 	data, ok := sigData.(*txsigning.SingleSignatureData)
 	if !ok {
-		return nil, nil, nil, types.ErrNotSingleSignautre
+		return nil, nil, types.ErrNotSingleSignautre
 	}
 
 	signBytes, err := handler.GetSignBytes(data.SignMode, signerData, tx)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
-	return signerAcc.GetPubKey().Bytes(), signBytes, data.Signature, nil
+	return signBytes, data.Signature, nil
 }
 
-func sdkMsgsToStargateMsgs(msgs []sdk.Msg) ([]wasmvmtypes.StargateMsg, error) {
-	stargateMsgs := []wasmvmtypes.StargateMsg{}
+func sdkMsgsToAnys(msgs []sdk.Msg) ([]*types.Any, error) {
+	anys := []*types.Any{}
 
 	for _, msg := range msgs {
-		bz, err := proto.Marshal(msg)
+		any, err := types.NewAnyFromProtoMsg(msg)
 		if err != nil {
 			return nil, err
 		}
 
-		stargateMsg := wasmvmtypes.StargateMsg{
-			TypeURL: sdk.MsgTypeURL(msg),
-			Value:   bz,
-		}
-
-		stargateMsgs = append(stargateMsgs, stargateMsg)
+		anys = append(anys, any)
 	}
 
-	return stargateMsgs, nil
+	return anys, nil
 }

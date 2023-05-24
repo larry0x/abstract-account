@@ -9,9 +9,6 @@ pub enum ContractError {
     #[error("signature is invalid")]
     InvalidSignature,
 
-    #[error("pubkey included in the contract does not match the account")]
-    PubKeyMismatch,
-
     #[error("only the contract itself can call this method")]
     Unauthorized,
 }
