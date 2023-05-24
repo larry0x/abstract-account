@@ -97,10 +97,10 @@ func signCmd() *cobra.Command {
 command does two things that doesn't make sense for AbstractAccounts (AAs):
 
 - It populates the tx with a secp256k1 pubkey, while AAs don't store pubkeys
-	at the sdk level;
+  at the sdk level;
 - it asserts that the pubkey derives an address that matches the tx's sender,
-	which isn't the case for AAs for which the addresses are derived by the wasm
-	module using a different set of rules.
+  which isn't the case for AAs for which the addresses are derived by the wasm
+  module using a different set of rules.
 
 This command on the other hand, populates the tx with a special NilPubKey type,
 while also skips the address check.
