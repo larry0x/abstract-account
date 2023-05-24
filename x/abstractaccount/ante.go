@@ -25,6 +25,22 @@ var (
 	_ sdk.PostDecorator = &AfterTxDecorator{}
 )
 
+// -------------------------------- GasComsumer --------------------------------
+
+func SigVerificationGasConsumer(
+	meter sdk.GasMeter, sig txsigning.SignatureV2, params authtypes.Params,
+) error {
+	// If the pubkey is a NilPubKey, for now we do not consume any gas (the
+	// contract execution consumes it)
+	// Otherwise, we simply delegate to the default consumer
+	switch sig.PubKey.(type) {
+	case *types.NilPubKey:
+		return nil
+	default:
+		return authante.DefaultSigVerificationGasConsumer(meter, sig, params)
+	}
+}
+
 // --------------------------------- BeforeTx ----------------------------------
 
 type BeforeTxDecorator struct {

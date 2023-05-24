@@ -329,7 +329,7 @@ func (app *SimApp) setAnteHandler(txCfg client.TxConfig, wasmCfg wasmtypes.WasmC
 				AccountKeeper:   app.AccountKeeper,
 				BankKeeper:      app.BankKeeper,
 				SignModeHandler: txCfg.SignModeHandler(),
-				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+				SigGasConsumer:  abstractaccount.SigVerificationGasConsumer,
 			},
 			AbstractAccountKeeper: app.AbstractAccountKeeper,
 			WasmKeeper:            app.WasmKeeper,
