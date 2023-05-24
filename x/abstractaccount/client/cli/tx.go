@@ -26,14 +26,14 @@ func GetTxCmd() *cobra.Command {
 		SilenceUsage:               true,
 	}
 
-	cmd.AddCommand(registerAccountCmd())
+	cmd.AddCommand(registerCmd())
 
 	return cmd
 }
 
-func registerAccountCmd() *cobra.Command {
+func registerCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "register-account [code-id] [msg] --funds [coins,optional]",
+		Use:   "register [code-id] [msg] --funds [coins,optional]",
 		Short: "Register an abstract account",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
