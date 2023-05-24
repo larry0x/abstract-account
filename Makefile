@@ -86,3 +86,17 @@ build:
 	@echo "🤖 Building simapp..."
 	go build $(BUILD_FLAGS) -o $(BUILDDIR)/ ./simapp/simd
 	@echo "✅ Completed build!"
+
+################################################################################
+###                                 Protobuf                                 ###
+################################################################################
+
+protoVer=0.11.6
+protoImageName=ghcr.io/cosmos/proto-builder:$(protoVer)
+containerProtoGenGo=aa-proto-gen-go-$(protoVer)
+
+proto-go-gen:
+	@echo "🤖 Generating Go code from protobuf..."
+	@if docker ps -a --format '{{.Names}}' | grep -Eq "^${containerProtoGenGo}$$"; then docker start -a $(containerProtoGenGo); else docker run --name $(containerProtoGenGo) -v $(CURDIR):/workspace --workdir /workspace $(protoImageName) \
+		sh ./scripts/protocgen.sh; fi
+	@echo "✅ Completed Go code generation!"
