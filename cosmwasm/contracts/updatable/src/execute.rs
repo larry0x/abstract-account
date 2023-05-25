@@ -20,9 +20,9 @@ pub fn before_tx(
     signature: &Binary,
 ) -> ContractResult<Response> {
     let sign_bytes_hash = sha256(sign_bytes);
-    let self_pubkey = PUBKEY.load(deps.storage)?;
+    let pubkey = PUBKEY.load(deps.storage)?;
 
-    if !deps.api.secp256k1_verify(&sign_bytes_hash, signature, &self_pubkey)? {
+    if !deps.api.secp256k1_verify(&sign_bytes_hash, signature, &pubkey)? {
         return Err(ContractError::InvalidSignature);
     }
 
