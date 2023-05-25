@@ -6,68 +6,59 @@ jobs:
   check:
     name: Check
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./cosmwasm
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          target: wasm32-unknown-unknown
-          override: true
-          profile: minimal
+          targets: wasm32-unknown-unknown
 
       - name: Check for errors
-        uses: actions-rs/cargo@v1
-        working-directory: ./cosmwasm
-        with:
-          command: check
-          args: --locked --tests --target wasm32-unknown-unknown
+        run: cargo check --locked --tests --target wasm32-unknown-unknown
         env:
           RUST_BACKTRACE: 1
 
   test:
     name: Test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./cosmwasm
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          override: true
-          profile: minimal
 
       - name: Run tests
-        uses: actions-rs/cargo@v1
-        working-directory: ./cosmwasm
-        with:
-          command: test
-          args: --lib --locked --tests
+        run: cargo test --lib --locked --tests
         env:
           RUST_BACKTRACE: 1
 
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./cosmwasm
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
 
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: nightly
-          override: true
-          profile: minimal
           components: clippy
 
       - name: Run clippy
-        uses: actions-rs/cargo@v1
-        working-directory: ./cosmwasm
-        with:
-          command: clippy
-          args: --tests -- -D warnings
+        run: clippy --tests -- -D warnings
