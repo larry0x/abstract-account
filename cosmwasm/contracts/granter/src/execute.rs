@@ -33,7 +33,9 @@ pub fn before_tx(
     // on to verify the signature
     // if it's signed by another pubkey, we need to make sure that this pubkey
     // has, for each message involved, a non-expired grant to send it
-    if credential.pubkey != pubkey {
+    let signer_is_self = credential.pubkey == pubkey;
+
+    if !signer_is_self {
         assert_has_grant(deps.storage, block, msgs, &credential.pubkey)?;
     }
 
@@ -42,7 +44,9 @@ pub fn before_tx(
     }
 
     Ok(Response::new()
-        .add_attribute("method", "before_tx"))
+        .add_attribute("method", "before_tx")
+        .add_attribute("signer_is_self", signer_is_self.to_string())
+        .add_attribute("signer", credential.pubkey.to_base64()))
 }
 
 pub fn after_tx() -> ContractResult<Response> {
