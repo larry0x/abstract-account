@@ -13,6 +13,7 @@ require (
 	github.com/golangci/golangci-lint v1.52.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/larry0x/simapp v0.0.0-20230527213943-e57d94ffca4c
 	github.com/spf13/cast v1.5.0
 	github.com/spf13/cobra v1.6.1
 	google.golang.org/grpc v1.55.0

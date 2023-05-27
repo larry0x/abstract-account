@@ -45,15 +45,13 @@ import (
 	consensus "github.com/cosmos/cosmos-sdk/x/consensus"
 	consensusparamkeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
-	"github.com/cosmos/cosmos-sdk/x/genutil"
-	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
-	"github.com/cosmos/cosmos-sdk/x/staking"
-	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
+	"github.com/larry0x/simapp/x/poa"
+	poatypes "github.com/larry0x/simapp/x/poa/types"
 
 	"github.com/larry0x/abstract-account/x/abstractaccount"
 	abstractaccountkeeper "github.com/larry0x/abstract-account/x/abstractaccount/keeper"
@@ -79,20 +77,17 @@ var (
 	DefaultNodeHome string
 
 	ModuleBasics = module.NewBasicManager(
-		auth.AppModuleBasic{},
-		genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
-		bank.AppModuleBasic{},
-		staking.AppModuleBasic{},
-		consensus.AppModuleBasic{},
-		wasm.AppModuleBasic{},
 		abstractaccount.AppModuleBasic{},
+		auth.AppModuleBasic{},
+		bank.AppModuleBasic{},
+		consensus.AppModuleBasic{},
+		poa.AppModuleBasic{},
+		wasm.AppModuleBasic{},
 	)
 
 	maccPerms = map[string][]string{
-		authtypes.FeeCollectorName:     nil,
-		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
-		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
-		wasm.ModuleName:                {authtypes.Burner},
+		authtypes.FeeCollectorName: nil,
+		wasm.ModuleName:            {authtypes.Burner},
 	}
 )
 
@@ -113,12 +108,11 @@ type SimApp struct {
 	tkeys   map[string]*storetypes.TransientStoreKey
 	memKeys map[string]*storetypes.MemoryStoreKey
 
+	AbstractAccountKeeper abstractaccountkeeper.Keeper
 	AccountKeeper         authkeeper.AccountKeeper
 	BankKeeper            bankkeeper.Keeper
-	StakingKeeper         *stakingkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	WasmKeeper            wasm.Keeper
-	AbstractAccountKeeper abstractaccountkeeper.Keeper
 
 	ModuleManager *module.Manager
 	configurator  module.Configurator
@@ -158,12 +152,11 @@ func NewSimApp(
 	bApp.SetTxEncoder(encCfg.TxConfig.TxEncoder())
 
 	keys := sdk.NewKVStoreKeys(
+		abstractaccounttypes.StoreKey,
 		authtypes.StoreKey,
 		banktypes.StoreKey,
-		stakingtypes.StoreKey,
 		consensusparamtypes.StoreKey,
 		wasm.StoreKey,
-		abstractaccounttypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys()
 	memKeys := sdk.NewMemoryStoreKeys()
@@ -203,21 +196,13 @@ func NewSimApp(
 		authority,
 	)
 
-	app.StakingKeeper = stakingkeeper.NewKeeper(
-		app.cdc,
-		keys[stakingtypes.StoreKey],
-		app.AccountKeeper,
-		app.BankKeeper,
-		authority,
-	)
-
 	wasmDir, wasmCfg, wasmCapabilities := wasmParams(appOpts)
 	app.WasmKeeper = wasm.NewKeeper(
 		app.cdc,
 		keys[wasm.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
-		app.StakingKeeper,
+		nil,
 		nil,
 		nil,
 		nil,
@@ -244,30 +229,27 @@ func NewSimApp(
 	)
 
 	app.ModuleManager = module.NewManager(
-		genutil.NewAppModule(app.AccountKeeper, app.StakingKeeper, app.BaseApp.DeliverTx, encCfg.TxConfig),
+		abstractaccount.NewAppModule(app.AbstractAccountKeeper),
 		auth.NewAppModule(app.cdc, app.AccountKeeper, authsims.RandomGenesisAccounts, nil),
 		bank.NewAppModule(app.cdc, app.BankKeeper, app.AccountKeeper, nil),
-		staking.NewAppModule(app.cdc, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, nil),
 		consensus.NewAppModule(app.cdc, app.ConsensusParamsKeeper),
-		wasm.NewAppModule(app.cdc, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.MsgServiceRouter(), nil),
-		abstractaccount.NewAppModule(app.AbstractAccountKeeper),
+		poa.NewAppModule(),
+		wasm.NewAppModule(app.cdc, &app.WasmKeeper, nil, app.AccountKeeper, app.BankKeeper, app.MsgServiceRouter(), nil),
 	)
 
 	app.ModuleManager.SetOrderBeginBlockers(
-		stakingtypes.ModuleName,
+		poatypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
-		genutiltypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		wasm.ModuleName,
 		abstractaccounttypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(
-		stakingtypes.ModuleName,
+		poatypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
-		genutiltypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		wasm.ModuleName,
 		abstractaccounttypes.ModuleName,
@@ -276,8 +258,7 @@ func NewSimApp(
 	genesisModuleOrder := []string{
 		authtypes.ModuleName,
 		banktypes.ModuleName,
-		stakingtypes.ModuleName,
-		genutiltypes.ModuleName,
+		poatypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		wasm.ModuleName,
 		abstractaccounttypes.ModuleName,

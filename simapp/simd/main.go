@@ -163,15 +163,18 @@ lru_size = 0`
 }
 
 func genesisCommand(encCfg simapp.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
-	cmd := genutilcli.GenesisCoreCommand(
-		encCfg.TxConfig,
-		simapp.ModuleBasics,
-		simapp.DefaultNodeHome,
-	)
-
-	for _, subcmd := range cmds {
-		cmd.AddCommand(subcmd)
+	cmd := &cobra.Command{
+		Use:                        "genesis",
+		Short:                      "Application's genesis-related subcommands",
+		DisableFlagParsing:         false,
+		SuggestionsMinimumDistance: 2,
+		RunE:                       client.ValidateCmd,
 	}
+
+	cmd.AddCommand(
+		genutilcli.ValidateGenesisCmd(simapp.ModuleBasics),
+		genutilcli.AddGenesisAccountCmd(simapp.DefaultNodeHome),
+	)
 
 	return cmd
 }
