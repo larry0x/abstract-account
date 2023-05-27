@@ -155,15 +155,19 @@ For PostHandler, we append a new [`AfterTxDecorator`][8], where the SCA's `after
 
 That's it - AA isn't complicated, and we don't break any existing thing. To sum it up: *two new sudo methods on the contract side, two new Ante/PostHandler decorators on the state machine side*.
 
-## How to use
-
-Now let's see how to incorporate this into your Cosmos chain.
-
-> TODO
-
 ## Demo
 
-> TODO
+This repository contains three SCAs for demo purposes. Note, they are not considered ready for production use:
+
+| Contract                                               | Description                                     | Video         |
+| ------------------------------------------------------ | ----------------------------------------------- | ------------- |
+| [`account-base`](./cosmwasm/contracts/base/)           | account controlled by a single secp256k1 pubkey | n/a           |
+| [`account-granter`](./cosmwasm/contracts/granter/)     | account with authz grant capability             | [YouTube][9]  |
+| [`account-updatable`](./cosmwasm/contracts/updatable/) | account with rotatable pubkey                   | [YouTube][10] |
+
+Two of these account types ("updatable" and "granter") have video demos; see the table above for YouTube links.
+
+They are also used in unit tests of the module; see relevant test files for details.
 
 ## License
 
@@ -177,3 +181,5 @@ TBD
 [6]: https://github.com/cosmos/cosmos-sdk/blob/v0.47.2/x/auth/ante/sigverify.go#L202-L205
 [7]: https://github.com/larry0x/abstract-account/blob/main/x/abstractaccount/ante.go#L46-L128
 [8]: https://github.com/larry0x/abstract-account/blob/main/x/abstractaccount/ante.go#L132-L173
+[9]: https://youtu.be/ofB53JgsWg0
+[10]: https://youtu.be/AdaLn28qG70
