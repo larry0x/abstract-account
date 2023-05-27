@@ -1,0 +1,28 @@
+run:
+  tests: false
+  timeout: 5m # timeout for analysis, e.g. 30s, 5m, default is 1m
+
+linters:
+  disable-all: true
+  enable:
+    - depguard
+    - dogsled
+    - errcheck
+    - exportloopref
+    - goconst
+    - gocritic
+    - gofumpt
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - nakedret
+    - nolintlint
+    - prealloc
+    - staticcheck
+    - stylecheck
+    - revive
+    - typecheck
+    - unconvert
+    - unused
