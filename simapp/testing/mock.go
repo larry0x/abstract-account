@@ -136,6 +136,6 @@ func MakeRandomConsensusPubKey() cryptotypes.PubKey {
 
 type EmptyAppOptions struct{}
 
-func (opts EmptyAppOptions) Get(o string) interface{} {
+func (opts EmptyAppOptions) Get(_ string) interface{} {
 	return nil
 }

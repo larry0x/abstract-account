@@ -42,7 +42,7 @@ func (AppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 	return cdc.MustMarshalJSON(types.DefaultGenesisState())
 }
 
-func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, cfg client.TxEncodingConfig, bz json.RawMessage) error {
+func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, _ client.TxEncodingConfig, bz json.RawMessage) error {
 	var gs types.GenesisState
 	if err := cdc.UnmarshalJSON(bz, &gs); err != nil {
 		return fmt.Errorf("failed to unmarshal x/%s genesis state: %w", types.ModuleName, err)
@@ -51,7 +51,8 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, cfg client.TxEncoding
 	return gs.Validate()
 }
 
-func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
+func (AppModuleBasic) RegisterGRPCGatewayRoutes(_ client.Context, _ *runtime.ServeMux) {
+	// nothing to do
 }
 
 func (AppModuleBasic) GetTxCmd() *cobra.Command {
@@ -73,7 +74,8 @@ func NewAppModule(keeper keeper.Keeper) AppModule {
 	return AppModule{AppModuleBasic{}, keeper}
 }
 
-func (AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
+func (AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {
+	// nothing to do
 }
 
 func (am AppModule) RegisterServices(cfg module.Configurator) {
@@ -84,10 +86,11 @@ func (AppModule) ConsensusVersion() uint64 {
 	return 1
 }
 
-func (AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
+func (AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {
+	// nothing to do
 }
 
-func (AppModule) EndBlock(ctx sdk.Context, req abci.RequestEndBlock) []abci.ValidatorUpdate {
+func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
 }
 
@@ -106,9 +109,9 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 // ----------------------------- Deprecated stuff ------------------------------
 
 // deprecated
-func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
+func (AppModuleBasic) RegisterLegacyAminoCodec(_ *codec.LegacyAmino) {
 }
 
 // deprecated
-func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
+func (AppModuleBasic) RegisterRESTRoutes(_ client.Context, _ *mux.Router) {
 }

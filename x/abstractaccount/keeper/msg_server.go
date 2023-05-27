@@ -32,7 +32,7 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 		senderAddr,
 		senderAddr,
 		req.Msg,
-		fmt.Sprintf("%s/%d", types.ModuleName, ms.k.GetAndIncrementNextAccountId(ctx)),
+		fmt.Sprintf("%s/%d", types.ModuleName, ms.k.GetAndIncrementNextAccountID(ctx)),
 		req.Funds,
 	)
 	if err != nil {

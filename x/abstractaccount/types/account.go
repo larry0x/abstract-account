@@ -49,7 +49,7 @@ func (acc *AbstractAccount) GetPubKey() cryptotypes.PubKey {
 	return NewNilPubKey(acc.GetAddress())
 }
 
-func (acc *AbstractAccount) SetPubKey(pk cryptotypes.PubKey) error {
+func (acc *AbstractAccount) SetPubKey(_ cryptotypes.PubKey) error {
 	return errors.New("cannot set pubkey for AbstractAccount")
 }
 
@@ -87,7 +87,7 @@ func (pk *NilPubKey) Bytes() []byte {
 	return nil
 }
 
-func (pk *NilPubKey) VerifySignature(msg []byte, sig []byte) bool {
+func (pk *NilPubKey) VerifySignature(_ []byte, _ []byte) bool {
 	panic("NilPubKey.VerifySignature should never be invoked")
 }
 

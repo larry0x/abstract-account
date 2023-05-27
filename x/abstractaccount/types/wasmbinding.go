@@ -23,15 +23,15 @@ type AfterTx struct {
 }
 
 func NewAnyFromProtoMsg(msg proto.Message) (*Any, error) {
-	bz, err := proto.Marshal(msg)
+	msgBytes, err := proto.Marshal(msg)
 	if err != nil {
 		return nil, err
 	}
 
-	any := &Any{
+	msgAny := &Any{
 		TypeURL: "/" + proto.MessageName(msg),
-		Value:   bz,
+		Value:   msgBytes,
 	}
 
-	return any, nil
+	return msgAny, nil
 }

@@ -232,12 +232,12 @@ func sdkMsgsToAnys(msgs []sdk.Msg) ([]*types.Any, error) {
 	anys := []*types.Any{}
 
 	for _, msg := range msgs {
-		any, err := types.NewAnyFromProtoMsg(msg)
+		msgAny, err := types.NewAnyFromProtoMsg(msg)
 		if err != nil {
 			return nil, err
 		}
 
-		anys = append(anys, any)
+		anys = append(anys, msgAny)
 	}
 
 	return anys, nil

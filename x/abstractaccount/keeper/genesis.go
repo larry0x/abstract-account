@@ -9,13 +9,13 @@ import (
 )
 
 func (k Keeper) InitGenesis(ctx sdk.Context, gs *types.GenesisState) []abci.ValidatorUpdate {
-	k.SetNextAccountId(ctx, gs.NextAccountId)
+	k.SetNextAccountID(ctx, gs.NextAccountId)
 
 	return []abci.ValidatorUpdate{}
 }
 
 func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
 	return &types.GenesisState{
-		NextAccountId: k.GetNextAccountId(ctx),
+		NextAccountId: k.GetNextAccountID(ctx),
 	}
 }

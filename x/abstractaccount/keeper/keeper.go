@@ -33,23 +33,23 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 // ------------------------------- NextAccountId -------------------------------
 
-func (k Keeper) GetAndIncrementNextAccountId(ctx sdk.Context) uint64 {
-	id := k.GetNextAccountId(ctx)
+func (k Keeper) GetAndIncrementNextAccountID(ctx sdk.Context) uint64 {
+	id := k.GetNextAccountID(ctx)
 
-	k.SetNextAccountId(ctx, id+1)
+	k.SetNextAccountID(ctx, id+1)
 
 	return id
 }
 
-func (k Keeper) GetNextAccountId(ctx sdk.Context) uint64 {
+func (k Keeper) GetNextAccountID(ctx sdk.Context) uint64 {
 	store := ctx.KVStore(k.storeKey)
 
-	return sdk.BigEndianToUint64(store.Get(types.KeyNextAccountId))
+	return sdk.BigEndianToUint64(store.Get(types.KeyNextAccountID))
 }
 
-func (k Keeper) SetNextAccountId(ctx sdk.Context, id uint64) {
+func (k Keeper) SetNextAccountID(ctx sdk.Context, id uint64) {
 	store := ctx.KVStore(k.storeKey)
-	store.Set(types.KeyNextAccountId, sdk.Uint64ToBigEndian(id))
+	store.Set(types.KeyNextAccountID, sdk.Uint64ToBigEndian(id))
 }
 
 // ------------------------------- SignerAddress -------------------------------
