@@ -32,7 +32,7 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 		senderAddr,
 		senderAddr,
 		req.Msg,
-		accountLabel(req.Sender, req.CodeID),
+		fmt.Sprintf("%s/%d", types.ModuleName, ms.k.GetAndIncrementNextAccountId(ctx)),
 		req.Funds,
 	)
 	if err != nil {
@@ -61,13 +61,4 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 	)
 
 	return &types.MsgRegisterAccountResponse{Address: contractAddr.String(), Data: data}, nil
-}
-
-func accountLabel(sender string, codeID uint64) string {
-	// Ideally we have a unique label for each abstract account. The current one
-	// obvious isn't unique.
-	//
-	// An option is `abstractaccount/blockHeight/txIndex/msgIndex` but I haven't
-	// figured how to determine the txIndex and msgIndex yet.
-	return fmt.Sprintf("abstractaccount/%s/%d", sender, codeID)
 }

@@ -31,9 +31,33 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", "x/"+types.ModuleName)
 }
 
+// ------------------------------- NextAccountId -------------------------------
+
+func (k Keeper) GetAndIncrementNextAccountId(ctx sdk.Context) uint64 {
+	id := k.GetNextAccountId(ctx)
+
+	k.SetNextAccountId(ctx, id+1)
+
+	return id
+}
+
+func (k Keeper) GetNextAccountId(ctx sdk.Context) uint64 {
+	store := ctx.KVStore(k.storeKey)
+
+	return sdk.BigEndianToUint64(store.Get(types.KeyNextAccountId))
+}
+
+func (k Keeper) SetNextAccountId(ctx sdk.Context, id uint64) {
+	store := ctx.KVStore(k.storeKey)
+	store.Set(types.KeyNextAccountId, sdk.Uint64ToBigEndian(id))
+}
+
+// ------------------------------- SignerAddress -------------------------------
+
 func (k Keeper) GetSignerAddress(ctx sdk.Context) sdk.AccAddress {
 	store := ctx.KVStore(k.storeKey)
-	return store.Get(types.KeySignerAddress)
+
+	return sdk.AccAddress(store.Get(types.KeySignerAddress))
 }
 
 func (k Keeper) SetSignerAddress(ctx sdk.Context, signerAddr sdk.AccAddress) {
