@@ -3,15 +3,11 @@ use cw_storage_plus::Bound;
 
 use crate::{
     msg::{GrantPaginationParam, GrantResponse},
-    state::{GRANTS, PUBKEY},
+    state::GRANTS,
 };
 
 pub const DEFAULT_LIMIT: u32 = 10;
 pub const MAX_LIMIT: u32 = 30;
-
-pub fn pubkey(store: &dyn Storage) -> StdResult<Binary> {
-    PUBKEY.load(store)
-}
 
 pub fn grant(store: &dyn Storage, type_url: String, grantee: Binary) -> StdResult<GrantResponse> {
     let grant = GRANTS.load(store, (&type_url, &grantee))?;

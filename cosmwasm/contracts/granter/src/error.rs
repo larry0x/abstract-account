@@ -1,6 +1,9 @@
 #[derive(Debug, thiserror::Error)]
 pub enum ContractError {
     #[error(transparent)]
+    Base(#[from] account_base::error::ContractError),
+
+    #[error(transparent)]
     Std(#[from] cosmwasm_std::StdError),
 
     #[error(transparent)]
@@ -18,14 +21,8 @@ pub enum ContractError {
         grantee: String,
     },
 
-    #[error("signature is invalid")]
-    InvalidSignature,
-
     #[error("cannot create a new grant that has already expired")]
     NewGrantExpired,
-
-    #[error("only the contract itself can call this method")]
-    Unauthorized,
 }
 
 pub type ContractResult<T> = Result<T, ContractError>;

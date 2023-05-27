@@ -14,11 +14,6 @@ pub struct Credential {
 }
 
 #[cw_serde]
-pub struct InstantiateMsg {
-    pub pubkey: Binary,
-}
-
-#[cw_serde]
 pub enum ExecuteMsg {
     /// Grant another pubkey the ability to sign messages on this account's
     /// behalf.

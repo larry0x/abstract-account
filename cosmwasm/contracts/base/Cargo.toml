@@ -1,6 +1,6 @@
 [package]
-name          = "account-updatable"
-description   = "An abstract account that allows rotating the pubkey associated with it"
+name          = "account-base"
+description   = "An abstract account that is controlled by a single private key"
 version       = { workspace = true }
 rust-version  = { workspace = true }
 authors       = { workspace = true }
@@ -22,7 +22,9 @@ library = []
 
 [dependencies]
 abstract-account = { path = "../../packages/abstract-account" }
-account-base     = { path = "../base", features = ["library"] }
 cosmwasm-schema  = { workspace = true }
 cosmwasm-std     = { workspace = true }
 cw2              = { workspace = true }
+cw-storage-plus  = { workspace = true }
+sha2             = { workspace = true }
+thiserror        = { workspace = true }

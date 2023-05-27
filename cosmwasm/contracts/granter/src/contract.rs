@@ -3,11 +3,12 @@ use cosmwasm_std::{
 };
 
 use abstract_account::AccountSudoMsg;
+use account_base::{self as base, msg::InstantiateMsg};
 
 use crate::{
     error::ContractResult,
     execute,
-    msg::{ExecuteMsg, InstantiateMsg, QueryMsg},
+    msg::{ExecuteMsg, QueryMsg},
     query,
     CONTRACT_NAME, CONTRACT_VERSION,
 };
@@ -20,7 +21,7 @@ pub fn instantiate(
     msg: InstantiateMsg,
 ) -> ContractResult<Response> {
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
-    execute::init(deps.storage, &msg.pubkey)
+    base::execute::init(deps.storage, &msg.pubkey).map_err(Into::into)
 }
 
 #[entry_point]
@@ -39,7 +40,7 @@ pub fn sudo(deps: DepsMut, env: Env, msg: AccountSudoMsg) -> ContractResult<Resp
         ),
         AccountSudoMsg::AfterTx {
             ..
-        } => execute::after_tx(),
+        } => base::execute::after_tx().map_err(Into::into),
     }
 }
 
@@ -66,7 +67,7 @@ pub fn execute(
 #[entry_point]
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
-        QueryMsg::Pubkey {} => to_binary(&query::pubkey(deps.storage)?),
+        QueryMsg::Pubkey {} => to_binary(&base::query::pubkey(deps.storage)?),
         QueryMsg::Grant {
             type_url,
             grantee,

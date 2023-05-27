@@ -1,21 +1,18 @@
-use abstract_account::Any;
-use cosmwasm_std::{Addr, Binary, Deps, Response, Storage, DepsMut, Env, MessageInfo, BlockInfo, from_binary};
+use cosmwasm_std::{Binary, Deps, Response, Storage, DepsMut, Env, MessageInfo, BlockInfo, from_binary};
 use cw_utils::Expiration;
-use sha2::{Digest, Sha256};
+
+use abstract_account::Any;
+use account_base::{
+    error::ContractError as BaseError,
+    execute::{assert_self, sha256},
+    state::PUBKEY,
+};
 
 use crate::{
     error::{ContractError, ContractResult},
     msg::{Credential, Grant},
-    state::{PUBKEY, GRANTS},
+    state::GRANTS,
 };
-
-pub fn init(store: &mut dyn Storage, pubkey: &Binary) -> ContractResult<Response> {
-    PUBKEY.save(store, pubkey)?;
-
-    Ok(Response::new()
-        .add_attribute("method", "init")
-        .add_attribute("pubkey", pubkey.to_base64()))
-}
 
 pub fn before_tx(
     deps: Deps,
@@ -40,18 +37,13 @@ pub fn before_tx(
     }
 
     if !deps.api.secp256k1_verify(&sign_bytes_hash, &credential.signature, &credential.pubkey)? {
-        return Err(ContractError::InvalidSignature);
+        return Err(BaseError::InvalidSignature.into());
     }
 
     Ok(Response::new()
         .add_attribute("method", "before_tx")
         .add_attribute("signer_is_self", signer_is_self.to_string())
         .add_attribute("signer", credential.pubkey.to_base64()))
-}
-
-pub fn after_tx() -> ContractResult<Response> {
-    Ok(Response::new()
-        .add_attribute("method", "after_tx"))
 }
 
 pub fn grant(
@@ -125,18 +117,4 @@ fn assert_has_grant(
     }
 
     Ok(())
-}
-
-fn assert_self(sender: &Addr, contract: &Addr) -> ContractResult<()> {
-    if sender != contract {
-        return Err(ContractError::Unauthorized);
-    }
-
-    Ok(())
-}
-
-fn sha256(msg: &[u8]) -> Vec<u8> {
-    let mut hasher = Sha256::new();
-    hasher.update(msg);
-    hasher.finalize().to_vec()
 }
