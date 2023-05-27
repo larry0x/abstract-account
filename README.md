@@ -157,7 +157,7 @@ That's it - AA isn't complicated, and we don't break any existing thing. To sum 
 
 ## Demo
 
-This repository contains three SCAs for demo purposes. Note, they are not considered ready for production use:
+This repository contains three SCAs for demo purpose. Note, they are not considered ready for production use:
 
 | Contract                                               | Description                                     | Video         |
 | ------------------------------------------------------ | ----------------------------------------------- | ------------- |
@@ -165,7 +165,7 @@ This repository contains three SCAs for demo purposes. Note, they are not consid
 | [`account-granter`](./cosmwasm/contracts/granter/)     | account with authz grant capability             | [YouTube][9]  |
 | [`account-updatable`](./cosmwasm/contracts/updatable/) | account with rotatable pubkey                   | [YouTube][10] |
 
-Two of these account types ("updatable" and "granter") have video demos; see the table above for YouTube links.
+Two of them ("updatable" and "granter") have accompanied video demos; see the table above for YouTube links.
 
 They are also used in unit tests of the module; see relevant test files for details.
 
