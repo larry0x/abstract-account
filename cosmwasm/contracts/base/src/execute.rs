@@ -16,13 +16,13 @@ pub fn init(store: &mut dyn Storage, pubkey: &Binary) -> ContractResult<Response
 
 pub fn before_tx(
     deps: Deps,
-    sign_bytes: &Binary,
+    tx_bytes: &Binary,
     signature: &Binary,
 ) -> ContractResult<Response> {
-    let sign_bytes_hash = sha256(sign_bytes);
+    let tx_bytes_hash = sha256(tx_bytes);
     let pubkey = PUBKEY.load(deps.storage)?;
 
-    if !deps.api.secp256k1_verify(&sign_bytes_hash, signature, &pubkey)? {
+    if !deps.api.secp256k1_verify(&tx_bytes_hash, signature, &pubkey)? {
         return Err(ContractError::InvalidSignature);
     }
 

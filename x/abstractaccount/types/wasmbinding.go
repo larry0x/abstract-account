@@ -14,7 +14,7 @@ type AccountSudoMsg struct {
 
 type BeforeTx struct {
 	Msgs       []*Any `json:"msgs"`
-	SignBytes  []byte `json:"sign_bytes"`
+	TxBytes    []byte `json:"tx_bytes"`
 	Credential []byte `json:"credential"`
 }
 

@@ -20,7 +20,7 @@ pub enum AccountSudoMsg {
         ///
         /// If the tx authentication requires a signature, this is the bytes to
         /// be signed.
-        sign_bytes: Binary,
+        tx_bytes: Binary,
 
         /// The credential to prove this tx is authenticated.
         ///

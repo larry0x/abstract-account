@@ -102,8 +102,8 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 
 	sudoMsgBytes, err := json.Marshal(&types.AccountSudoMsg{
 		BeforeTx: &types.BeforeTx{
-			Msgs:      msgAnys,
-			SignBytes: signBytes,
+			Msgs:    msgAnys,
+			TxBytes: signBytes,
 			// Note that we call this field "credential" instead of signature. There
 			// is an important reason for this!
 			//

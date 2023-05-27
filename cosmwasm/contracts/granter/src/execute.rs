@@ -18,10 +18,10 @@ pub fn before_tx(
     deps: Deps,
     block: &BlockInfo,
     msgs: &[Any],
-    sign_bytes: &Binary,
+    tx_bytes: &Binary,
     credential_bytes: &Binary,
 ) -> ContractResult<Response> {
-    let sign_bytes_hash = sha256(sign_bytes);
+    let tx_bytes_hash = sha256(tx_bytes);
     let pubkey = PUBKEY.load(deps.storage)?;
 
     let credential: Credential = from_binary(credential_bytes)?;
@@ -36,7 +36,7 @@ pub fn before_tx(
         assert_has_grant(deps.storage, block, msgs, &credential.pubkey)?;
     }
 
-    if !deps.api.secp256k1_verify(&sign_bytes_hash, &credential.signature, &credential.pubkey)? {
+    if !deps.api.secp256k1_verify(&tx_bytes_hash, &credential.signature, &credential.pubkey)? {
         return Err(BaseError::InvalidSignature.into());
     }
 
