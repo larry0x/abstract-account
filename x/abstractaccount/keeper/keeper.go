@@ -24,6 +24,14 @@ func NewKeeper(
 	cdc codec.BinaryCodec, storeKey storetypes.StoreKey,
 	ak authkeeper.AccountKeeperI, ck wasmtypes.ContractOpsKeeper,
 ) Keeper {
+	if ak == nil {
+		panic("AccountKeeperI cannot be nil")
+	}
+
+	if ck == nil {
+		panic("ContractOpsKeeper cannot be nil")
+	}
+
 	return Keeper{cdc, storeKey, ak, ck}
 }
 
@@ -31,7 +39,6 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", "x/"+types.ModuleName)
 }
 
-// for used in testing only
 func (k Keeper) ContractKeeper() wasmtypes.ContractOpsKeeper {
 	return k.ck
 }
