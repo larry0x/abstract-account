@@ -31,6 +31,11 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", "x/"+types.ModuleName)
 }
 
+// for used in testing only
+func (k Keeper) ContractKeeper() wasmtypes.ContractOpsKeeper {
+	return k.ck
+}
+
 // ------------------------------- NextAccountId -------------------------------
 
 func (k Keeper) GetAndIncrementNextAccountID(ctx sdk.Context) uint64 {

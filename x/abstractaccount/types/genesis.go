@@ -1,7 +1,13 @@
 package types
 
+func NewGenesisState(nextAccountID uint64) *GenesisState {
+	return &GenesisState{
+		NextAccountId: nextAccountID,
+	}
+}
+
 func DefaultGenesisState() *GenesisState {
-	return &GenesisState{NextAccountId: 1}
+	return NewGenesisState(1)
 }
 
 func (GenesisState) Validate() error {

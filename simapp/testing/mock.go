@@ -44,6 +44,10 @@ var DefaultConsensusParams = &tmproto.ConsensusParams{
 	},
 }
 
+func MakeSimpleMockApp() *simapp.SimApp {
+	return MakeMockApp([]banktypes.Balance{})
+}
+
 func MakeMockApp(balances []banktypes.Balance) *simapp.SimApp {
 	encCfg := simapp.MakeEncodingConfig()
 
@@ -126,6 +130,10 @@ func MakeMockGenesisState(cdc codec.JSONCodec, balances []banktypes.Balance) sim
 
 func MakeRandomAddress() sdk.AccAddress {
 	return sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
+}
+
+func MakeRandomPubKey() cryptotypes.PubKey {
+	return secp256k1.GenPrivKey().PubKey()
 }
 
 func MakeRandomConsensusPubKey() cryptotypes.PubKey {
