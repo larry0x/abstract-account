@@ -57,7 +57,7 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 	// - This one signer is an AbstractAccount
 	//
 	// Both criteria must be satisfied for this be to be qualified as an AA tx.
-	isAbstractAccountTx, signerAcc, sig, err := isAbstractAccountTx(ctx, tx, d.ak)
+	isAbstractAccountTx, signerAcc, sig, err := IsAbstractAccountTx(ctx, tx, d.ak)
 	if err != nil {
 		return ctx, err
 	}
@@ -166,7 +166,7 @@ func (d AfterTxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate, succe
 
 // ---------------------------------- Helpers ----------------------------------
 
-func isAbstractAccountTx(ctx sdk.Context, tx sdk.Tx, ak authante.AccountKeeper) (bool, *types.AbstractAccount, *txsigning.SignatureV2, error) {
+func IsAbstractAccountTx(ctx sdk.Context, tx sdk.Tx, ak authante.AccountKeeper) (bool, *types.AbstractAccount, *txsigning.SignatureV2, error) {
 	sigTx, ok := tx.(authsigning.SigVerifiableTx)
 	if !ok {
 		return false, nil, nil, errors.Wrap(sdkerrors.ErrTxDecode, "tx is not a SigVerifiableTx")
