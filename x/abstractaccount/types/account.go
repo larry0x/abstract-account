@@ -30,6 +30,10 @@ func NewAbstractAccount(address string, accountNum, seq uint64) *AbstractAccount
 	}
 }
 
+func NewAbstractAccountFromAccount(acc authtypes.AccountI) *AbstractAccount {
+	return NewAbstractAccount(acc.GetAddress().String(), acc.GetAccountNumber(), acc.GetSequence())
+}
+
 func (acc *AbstractAccount) GetAddress() sdk.AccAddress {
 	addr, _ := sdk.AccAddressFromBech32(acc.Address)
 	return addr

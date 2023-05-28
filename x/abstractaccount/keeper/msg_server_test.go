@@ -71,8 +71,12 @@ func TestRegisterAccount(t *testing.T) {
 	contractInfo := app.WasmKeeper.GetContractInfo(ctx, contractAddr)
 	require.Equal(t, codeID, contractInfo.CodeID)
 	require.Equal(t, user.String(), contractInfo.Creator)
-	require.Equal(t, user.String(), contractInfo.Admin)
+	require.Equal(t, contractAddr.String(), contractInfo.Admin)
 	require.Equal(t, fmt.Sprintf("%s/%d", types.ModuleName, k.GetNextAccountID(ctx)-1), contractInfo.Label)
+
+	// make sure an AbstractAccount has been created
+	_, ok := app.AccountKeeper.GetAccount(ctx, contractAddr).(*types.AbstractAccount)
+	require.True(t, ok)
 
 	// make sure the contract has received the funds
 	balance := app.BankKeeper.GetAllBalances(ctx, contractAddr)

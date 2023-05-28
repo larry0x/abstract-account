@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/larry0x/abstract-account/x/abstractaccount/types"
 )
@@ -39,10 +40,19 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 		return nil, err
 	}
 
-	// The previous contract instantiation should have created a BaseAccount.
-	// We wrap this BaseAccount in our AbstractAccount type and overwrite it.
+	// set the contract's admin to itself
+	if err = ms.k.ck.UpdateContractAdmin(ctx, contractAddr, senderAddr, contractAddr); err != nil {
+		return nil, err
+	}
+
+	// the contract instantiation should have created a BaseAccount
 	acc := ms.k.ak.GetAccount(ctx, contractAddr)
-	ms.k.ak.SetAccount(ctx, types.NewAbstractAccount(acc.GetAddress().String(), acc.GetAccountNumber(), acc.GetSequence()))
+	if _, ok := acc.(*authtypes.BaseAccount); !ok {
+		return nil, types.ErrNotBaseAccount
+	}
+
+	// we overwrite this BaseAccount with our AbstractAccount
+	ms.k.ak.SetAccount(ctx, types.NewAbstractAccountFromAccount(acc))
 
 	ms.k.Logger(ctx).Info(
 		"abstract account registered",
