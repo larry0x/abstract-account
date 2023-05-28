@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/posthandler"
 
-	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
@@ -20,10 +19,9 @@ import (
 type AnteHandlerOptions struct {
 	ante.HandlerOptions
 
-	AbstractAccountKeeper abstractaccountkeeper.Keeper
-	WasmKeeper            wasm.Keeper
 	WasmCfg               *wasmtypes.WasmConfig
 	TXCounterStoreKey     storetypes.StoreKey
+	AbstractAccountKeeper abstractaccountkeeper.Keeper
 }
 
 func NewAnteHandler(options AnteHandlerOptions) (sdk.AnteHandler, error) {
@@ -68,7 +66,6 @@ func NewAnteHandler(options AnteHandlerOptions) (sdk.AnteHandler, error) {
 		abstractaccount.NewBeforeTxDecorator(
 			options.AbstractAccountKeeper,
 			options.AccountKeeper,
-			wasmkeeper.NewGovPermissionKeeper(options.WasmKeeper),
 			options.SignModeHandler,
 		),
 		ante.NewIncrementSequenceDecorator(options.AccountKeeper),
@@ -82,9 +79,8 @@ func NewAnteHandler(options AnteHandlerOptions) (sdk.AnteHandler, error) {
 type PostHandlerOptions struct {
 	posthandler.HandlerOptions
 
-	AbstractAccountKeeper abstractaccountkeeper.Keeper
 	AccountKeeper         ante.AccountKeeper
-	WasmKeeper            wasm.Keeper
+	AbstractAccountKeeper abstractaccountkeeper.Keeper
 }
 
 func NewPostHandler(options PostHandlerOptions) (sdk.PostHandler, error) {
@@ -93,11 +89,7 @@ func NewPostHandler(options PostHandlerOptions) (sdk.PostHandler, error) {
 	}
 
 	postDecorators := []sdk.PostDecorator{
-		abstractaccount.NewAfterTxDecorator(
-			options.AbstractAccountKeeper,
-			options.AccountKeeper,
-			wasmkeeper.NewGovPermissionKeeper(options.WasmKeeper),
-		),
+		abstractaccount.NewAfterTxDecorator(options.AbstractAccountKeeper),
 	}
 
 	return sdk.ChainPostDecorators(postDecorators...), nil

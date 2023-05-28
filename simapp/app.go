@@ -312,10 +312,9 @@ func (app *SimApp) setAnteHandler(txCfg client.TxConfig, wasmCfg wasmtypes.WasmC
 				SignModeHandler: txCfg.SignModeHandler(),
 				SigGasConsumer:  abstractaccount.SigVerificationGasConsumer,
 			},
-			AbstractAccountKeeper: app.AbstractAccountKeeper,
-			WasmKeeper:            app.WasmKeeper,
 			WasmCfg:               &wasmCfg,
 			TXCounterStoreKey:     txCounterStoreKey,
+			AbstractAccountKeeper: app.AbstractAccountKeeper,
 		},
 	)
 	if err != nil {
@@ -329,9 +328,8 @@ func (app *SimApp) setPostHandler() {
 	postHandler, err := NewPostHandler(
 		PostHandlerOptions{
 			HandlerOptions:        posthandler.HandlerOptions{},
-			AbstractAccountKeeper: app.AbstractAccountKeeper,
 			AccountKeeper:         app.AccountKeeper,
-			WasmKeeper:            app.WasmKeeper,
+			AbstractAccountKeeper: app.AbstractAccountKeeper,
 		},
 	)
 	if err != nil {

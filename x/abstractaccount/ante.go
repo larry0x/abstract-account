@@ -12,10 +12,8 @@ import (
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-
-	keeper "github.com/larry0x/abstract-account/x/abstractaccount/keeper"
-	types "github.com/larry0x/abstract-account/x/abstractaccount/types"
+	"github.com/larry0x/abstract-account/x/abstractaccount/keeper"
+	"github.com/larry0x/abstract-account/x/abstractaccount/types"
 )
 
 var (
@@ -44,15 +42,11 @@ func SigVerificationGasConsumer(
 type BeforeTxDecorator struct {
 	aak             keeper.Keeper
 	ak              authante.AccountKeeper
-	ck              wasmtypes.ContractOpsKeeper
 	signModeHandler authsigning.SignModeHandler
 }
 
-func NewBeforeTxDecorator(
-	aak keeper.Keeper, ak authante.AccountKeeper,
-	ck wasmtypes.ContractOpsKeeper, signModeHandler authsigning.SignModeHandler,
-) BeforeTxDecorator {
-	return BeforeTxDecorator{aak, ak, ck, signModeHandler}
+func NewBeforeTxDecorator(aak keeper.Keeper, ak authante.AccountKeeper, signModeHandler authsigning.SignModeHandler) BeforeTxDecorator {
+	return BeforeTxDecorator{aak, ak, signModeHandler}
 }
 
 func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
@@ -121,7 +115,7 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 		return ctx, err
 	}
 
-	_, err = d.ck.Sudo(ctx, signerAcc.GetAddress(), sudoMsgBytes)
+	_, err = d.aak.ContractKeeper().Sudo(ctx, signerAcc.GetAddress(), sudoMsgBytes)
 	if err != nil {
 		return ctx, err
 	}
@@ -133,12 +127,10 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 
 type AfterTxDecorator struct {
 	aak keeper.Keeper
-	ak  authante.AccountKeeper
-	ck  wasmtypes.ContractOpsKeeper
 }
 
-func NewAfterTxDecorator(aak keeper.Keeper, ak authante.AccountKeeper, ck wasmtypes.ContractOpsKeeper) AfterTxDecorator {
-	return AfterTxDecorator{aak, ak, ck}
+func NewAfterTxDecorator(aak keeper.Keeper) AfterTxDecorator {
+	return AfterTxDecorator{aak}
 }
 
 func (d AfterTxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate, success bool, next sdk.PostHandler) (newCtx sdk.Context, err error) {
@@ -164,7 +156,7 @@ func (d AfterTxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate, succe
 		return ctx, err
 	}
 
-	_, err = d.ck.Sudo(ctx, signerAddr, sudoMsgBytes)
+	_, err = d.aak.ContractKeeper().Sudo(ctx, signerAddr, sudoMsgBytes)
 	if err != nil {
 		return ctx, err
 	}
