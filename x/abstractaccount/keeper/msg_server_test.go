@@ -50,7 +50,7 @@ func TestRegisterAccount(t *testing.T) {
 	require.NoError(t, err)
 
 	// prepare the contract instantiate msg
-	initMsgBytes, err := json.Marshal(&AccountInitMsg{
+	msgBytes, err := json.Marshal(&AccountInitMsg{
 		PubKey: simapptesting.MakeRandomPubKey().Bytes(),
 	})
 	require.NoError(t, err)
@@ -59,7 +59,7 @@ func TestRegisterAccount(t *testing.T) {
 	res, err := msgServer.RegisterAccount(ctx, &types.MsgRegisterAccount{
 		Sender: user.String(),
 		CodeID: codeID,
-		Msg:    initMsgBytes,
+		Msg:    msgBytes,
 		Funds:  acctRegisterFunds,
 	})
 	require.NoError(t, err)
