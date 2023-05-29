@@ -2,7 +2,6 @@ package abstractaccount_test
 
 import (
 	"testing"
-	"time"
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/require"
@@ -19,12 +18,8 @@ import (
 func TestIsAbstractAccountTx(t *testing.T) {
 	var (
 		app     = simapptesting.MakeSimpleMockApp()
+		ctx     = app.NewContext(false, tmproto.Header{})
 		keybase = keyring.NewInMemory(app.Codec())
-		ctx     = app.NewContext(false, tmproto.Header{
-			// must specify a time, otherwise will get this error:
-			// panic: Block (unix) time must never be empty or negative
-			Time: time.Now(),
-		})
 	)
 
 	// we create two mock accounts: 1 a BaseAccount, 2 an AbstractAccount
