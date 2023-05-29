@@ -26,11 +26,7 @@ func (m *MsgRegisterAccount) ValidateBasic() error {
 		return sdkerrors.ErrInvalidCoins
 	}
 
-	if err := wasmtypes.ValidateSalt(m.Salt); err != nil {
-		return err
-	}
-
-	return nil
+	return wasmtypes.ValidateSalt(m.Salt)
 }
 
 func (m *MsgRegisterAccount) GetSigners() []sdk.AccAddress {
