@@ -3,6 +3,8 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 )
 
 var _ sdk.Msg = &MsgRegisterAccount{}
@@ -22,6 +24,10 @@ func (m *MsgRegisterAccount) ValidateBasic() error {
 
 	if !m.Funds.IsValid() {
 		return sdkerrors.ErrInvalidCoins
+	}
+
+	if err := wasmtypes.ValidateSalt(m.Salt); err != nil {
+		return err
 	}
 
 	return nil

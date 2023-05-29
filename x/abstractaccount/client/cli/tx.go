@@ -33,9 +33,9 @@ func GetTxCmd() *cobra.Command {
 
 func registerCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "register [code-id] [msg] --funds [coins,optional]",
+		Use:   "register [code-id] [msg] --salt [string] --funds [coins,optional]",
 		Short: "Register an abstract account",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -62,6 +62,7 @@ func registerCmd() *cobra.Command {
 				CodeID: codeID,
 				Msg:    []byte(args[1]),
 				Funds:  amount,
+				Salt:   []byte(args[2]),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {

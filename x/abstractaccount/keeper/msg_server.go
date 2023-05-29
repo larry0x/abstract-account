@@ -27,7 +27,7 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 		return nil, err
 	}
 
-	contractAddr, data, err := ms.k.ck.Instantiate(
+	contractAddr, data, err := ms.k.ck.Instantiate2(
 		ctx,
 		req.CodeID,
 		senderAddr,
@@ -35,6 +35,8 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 		req.Msg,
 		fmt.Sprintf("%s/%d", types.ModuleName, ms.k.GetAndIncrementNextAccountID(ctx)),
 		req.Funds,
+		req.Salt,
+		true, // I'm still not sure whether true is strictly better than false. Research needed
 	)
 	if err != nil {
 		return nil, err

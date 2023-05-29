@@ -20,15 +20,26 @@ message MsgRegisterAccount {
   option (gogoproto.equal)           = false;
   option (gogoproto.goproto_getters) = false;
 
-  string                            sender  = 1;
-  uint64                            code_id = 2 [(gogoproto.customname) = "CodeID"];
-  bytes                             msg     = 3 [
+  // Sender is the actor who signs the message
+  string sender  = 1;
+
+  // CodeID indicates which wasm binary code is to be used for this contract
+  uint64 code_id = 2 [(gogoproto.customname) = "CodeID"];
+
+  // Msg is the JSON-encoded instantiate message for the contract
+  bytes msg = 3 [
     (gogoproto.casttype) = "github.com/CosmWasm/wasmd/x/wasm/types.RawContractMessage"
   ];
-  repeated cosmos.base.v1beta1.Coin funds   = 4 [
+
+  // Funds are coins to be deposited to the contract on instantiattion
+  repeated cosmos.base.v1beta1.Coin funds = 4 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+
+  // Salt is an arbinary value to be used in deriving the account address.
+  // Max 64 bytes.
+  bytes salt = 5;
 }
 
 message MsgRegisterAccountResponse {

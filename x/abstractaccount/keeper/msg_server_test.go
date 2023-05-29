@@ -61,6 +61,7 @@ func TestRegisterAccount(t *testing.T) {
 		CodeID: codeID,
 		Msg:    msgBytes,
 		Funds:  acctRegisterFunds,
+		Salt:   []byte("hello"),
 	})
 	require.NoError(t, err)
 
