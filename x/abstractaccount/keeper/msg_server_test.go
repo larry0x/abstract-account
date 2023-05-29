@@ -37,7 +37,10 @@ func TestRegisterAccount(t *testing.T) {
 	})
 
 	ctx := app.NewContext(false, tmproto.Header{
-		// must specify a time, otherwise will get this error:
+		// whenever we execute a contract, we must specify the block time in the
+		// header, so that wasmkeeper knows what to use for env.block.time
+		//
+		// if not doing this, will get this error:
 		// panic: Block (unix) time must never be empty or negative
 		Time: time.Now(),
 	})
