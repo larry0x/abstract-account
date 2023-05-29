@@ -1,7 +1,6 @@
 package abstractaccount_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -170,8 +169,6 @@ func TestBeforeTx(t *testing.T) {
 			expOk:    false,
 		},
 	} {
-		fmt.Println("running test case: ", tc.desc)
-
 		msg := banktypes.NewMsgSend(absAcc.GetAddress(), acc2.GetAddress(), sdk.NewCoins())
 
 		tx, err := prepareTx2(
