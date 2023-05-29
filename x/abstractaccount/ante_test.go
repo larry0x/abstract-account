@@ -106,7 +106,7 @@ func TestBeforeTx(t *testing.T) {
 	acc2, err := makeMockAccount(keybase, "test2")
 	require.NoError(t, err)
 
-	// register the account
+	// register the AbstractAccount
 	absAcc, err := storeCodeAndRegisterAccount(
 		ctx,
 		app,
@@ -209,5 +209,48 @@ func TestBeforeTx(t *testing.T) {
 }
 
 func TestAfterTx(t *testing.T) {
-	// TODO
+	var (
+		app     = simapptesting.MakeSimpleMockApp()
+		keybase = keyring.NewInMemory(app.Codec())
+	)
+
+	ctx := app.NewContext(false, tmproto.Header{
+		Time:    time.Now(),
+		ChainID: mockChainID,
+	})
+
+	// create a mock account
+	acc, err := makeMockAccount(keybase, "test1")
+	require.NoError(t, err)
+
+	// register the AbstractAccount
+	absAcc, err := storeCodeAndRegisterAccount(
+		ctx,
+		app,
+		acc.GetAddress(),
+		testdata.AccountWasm,
+		&AccountInitMsg{PubKey: acc.GetPubKey().Bytes()},
+		sdk.NewCoins(),
+	)
+	require.NoError(t, err)
+
+	// save the signer address to mimic what happens in the BeforeTx hook
+	app.AbstractAccountKeeper.SetSignerAddress(ctx, absAcc.GetAddress())
+
+	tx, err := prepareTx2(
+		ctx,
+		app,
+		[]sdk.Msg{banktypes.NewMsgSend(absAcc.GetAddress(), acc.GetAddress(), sdk.NewCoins())},
+		keybase,
+		"test1",
+		absAcc,
+		mockChainID,
+		absAcc.GetAccountNumber(),
+		absAcc.GetSequence(),
+	)
+	require.NoError(t, err)
+
+	decorator := makeAfterTxDecorator(app)
+	_, err = decorator.PostHandle(ctx, tx, false, true, postTerminator)
+	require.NoError(t, err)
 }
