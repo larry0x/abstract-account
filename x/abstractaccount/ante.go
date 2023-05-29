@@ -74,6 +74,11 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 		return svd.AnteHandle(ctx, tx, simulate, next)
 	}
 
+	// Check account sequence number
+	if sig.Sequence != signerAcc.GetSequence() {
+		return ctx, sdkerrors.ErrWrongSequence.Wrapf("account sequence mismatch, expected %d, got %d", signerAcc.GetSequence(), sig.Sequence)
+	}
+
 	// Now that we've determined the tx is an AA tx, let us prepare the SudoMsg
 	// that will be used to invoke the account contract. The msg includes:
 	//
