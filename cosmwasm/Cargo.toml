@@ -13,13 +13,15 @@ documentation = "https://github.com/larry0x/abstract-account#readme"
 keywords      = ["blockchain", "cosmos", "cosmwasm", "account-abstraction"]
 
 [workspace.dependencies]
-cosmwasm-schema = "1.2"
-cosmwasm-std    = { version = "1.2", features = ["stargate"] }
-cw2             = "1.0"
-cw-storage-plus = "1"
-cw-utils        = "1"
-sha2            = "0.10"
-thiserror       = "1"
+cosmos-sdk-proto = { version = "0.19", default-features = false }
+cosmwasm-schema  = "1.2"
+cosmwasm-std     = { version = "1.2", features = ["stargate"] }
+cw2              = "1.0"
+cw-storage-plus  = "1"
+cw-utils         = "1"
+prost            = "0.11"
+sha2             = "0.10"
+thiserror        = "1"
 
 [profile.release]
 codegen-units    = 1

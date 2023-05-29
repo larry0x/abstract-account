@@ -12,5 +12,7 @@ documentation = { workspace = true }
 keywords      = { workspace = true }
 
 [dependencies]
-cosmwasm-schema = { workspace = true }
-cosmwasm-std    = { workspace = true }
+cosmos-sdk-proto = { workspace = true }
+cosmwasm-schema  = { workspace = true }
+cosmwasm-std     = { workspace = true }
+prost            = { workspace = true }

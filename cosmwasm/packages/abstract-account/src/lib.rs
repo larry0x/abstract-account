@@ -1,3 +1,5 @@
+mod proto;
+
 use cosmwasm_schema::cw_serde;
 use cosmwasm_std::Binary;
 
