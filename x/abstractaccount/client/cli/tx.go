@@ -11,10 +11,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
 	"github.com/larry0x/abstract-account/x/abstractaccount/types"
 )
 
-const flagFunds = "funds"
+const (
+	flagSalt  = "salt"
+	flagFunds = "funds"
+)
 
 func GetTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -35,7 +40,7 @@ func registerCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "register [code-id] [msg] --salt [string] --funds [coins,optional]",
 		Short: "Register an abstract account",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -45,6 +50,16 @@ func registerCmd() *cobra.Command {
 			codeID, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return err
+			}
+
+			salt, err := cmd.Flags().GetString(flagSalt)
+			if err != nil {
+				return fmt.Errorf("salt: %s", err)
+			}
+
+			saltBytes := []byte(salt)
+			if err = wasmtypes.ValidateSalt(saltBytes); err != nil {
+				return fmt.Errorf("salt: %s", err)
 			}
 
 			amountStr, err := cmd.Flags().GetString(flagFunds)
@@ -62,7 +77,7 @@ func registerCmd() *cobra.Command {
 				CodeID: codeID,
 				Msg:    []byte(args[1]),
 				Funds:  amount,
-				Salt:   []byte(args[2]),
+				Salt:   saltBytes,
 			}
 
 			if err := msg.ValidateBasic(); err != nil {
@@ -76,6 +91,7 @@ func registerCmd() *cobra.Command {
 
 	flags.AddTxFlagsToCmd(cmd)
 
+	cmd.Flags().String(flagSalt, "", "Salt value used in determining account address")
 	cmd.Flags().String(flagFunds, "", "Coins to send to the account during instantiation")
 
 	return cmd
