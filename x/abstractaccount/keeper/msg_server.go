@@ -36,7 +36,11 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 		fmt.Sprintf("%s/%d", types.ModuleName, ms.k.GetAndIncrementNextAccountID(ctx)),
 		req.Funds,
 		req.Salt,
-		true, // I'm still not sure whether true is strictly better than false. Research needed
+		// we set fix_msg to false because there simply isn't any good reason
+		// otherwise, given that we already have full control over the address by
+		// providing a salt. read more:
+		// https://medium.com/cosmwasm/dev-note-3-limitations-of-instantiate2-and-how-to-deal-with-them-a3f946874230
+		false,
 	)
 	if err != nil {
 		return nil, err
