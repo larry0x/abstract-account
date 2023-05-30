@@ -159,11 +159,12 @@ That's it - AA isn't complicated, and we don't break any existing thing. To sum 
 
 This repository contains three SCAs for demo purpose. Note, they are not considered ready for production use:
 
-| Contract                                               | Description                                     | Video         |
-| ------------------------------------------------------ | ----------------------------------------------- | ------------- |
-| [`account-base`](./cosmwasm/contracts/base/)           | account controlled by a single secp256k1 pubkey | n/a           |
-| [`account-granter`](./cosmwasm/contracts/granter/)     | account with authz grant capability             | [YouTube][9]  |
-| [`account-updatable`](./cosmwasm/contracts/updatable/) | account with rotatable pubkey                   | [YouTube][10] |
+| Contract                                               | Description                                                  | Video         |
+| ------------------------------------------------------ | ------------------------------------------------------------ | ------------- |
+| [`account-asym-totp`](./cosmwasm/contracts/asym-totp/) | account that uses an asymmetric time-based one-time password | n/a           |
+| [`account-base`](./cosmwasm/contracts/base/)           | account controlled by a single secp256k1 pubkey              | n/a           |
+| [`account-granter`](./cosmwasm/contracts/granter/)     | account with authz grant capability                          | [YouTube][9]  |
+| [`account-updatable`](./cosmwasm/contracts/updatable/) | account with rotatable pubkey                                | [YouTube][10] |
 
 Two of them ("updatable" and "granter") have accompanied video demos; see the table above for YouTube links.
 
