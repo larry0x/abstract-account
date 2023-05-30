@@ -17,7 +17,8 @@ pub fn init(deps: DepsMut, env: Env, cfg: &Config) -> ContractResult<Response> {
         .add_attribute("method", "init")
         .add_attribute("pubkey", cfg.pubkey.to_base64())
         .add_attribute("otp_pubkey", cfg.otp_pubkey.to_base64())
-        .add_attribute("duration_secs", cfg.duration_secs.to_string()))
+        .add_attribute("duration_secs", cfg.duration_secs.to_string())
+        .add_attribute("previous_count", prev_count.to_string()))
 }
 
 pub fn before_tx(
