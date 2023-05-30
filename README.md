@@ -174,7 +174,7 @@ They are also used in unit tests of the module; see relevant test files for deta
 
 Abstract Account © 2023 [larry0x](11)
 
-Materials in this repository are private properties owned solely by [larry0x](11). Distribution of these materials in any form, such as deployment of onto blockchains, is prohibited without the express agreement from the owner.
+Materials in this repository are private properties owned solely by [larry0x](11). Distribution of these materials in any form, such as deployment onto blockchains, is prohibited without the express agreement from the owner.
 
 [1]: https://cosmwasm.com/
 [2]: https://eips.ethereum.org/EIPS/eip-2938
