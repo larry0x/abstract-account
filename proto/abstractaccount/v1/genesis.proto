@@ -1,5 +1,5 @@
 syntax = "proto3";
-package abstractaccount.v1beta1;
+package abstractaccount.v1;
 
 option go_package = "github.com/larry0x/abstract-account/x/abstractaccount/types";
 
