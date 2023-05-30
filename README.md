@@ -161,10 +161,10 @@ This repository contains three SCAs for demo purpose. Note, they are not conside
 
 | Contract                                               | Description                                                  | Video         |
 | ------------------------------------------------------ | ------------------------------------------------------------ | ------------- |
-| [`account-asym-totp`](./cosmwasm/contracts/asym-totp/) | account that uses an asymmetric time-based one-time password | n/a           |
+| [`account-asym-totp`](./cosmwasm/contracts/asym-totp/) | account that uses an asymmetric time-based one-time password | [YouTube][9]  |
 | [`account-base`](./cosmwasm/contracts/base/)           | account controlled by a single secp256k1 pubkey              | n/a           |
-| [`account-granter`](./cosmwasm/contracts/granter/)     | account with authz grant capability                          | [YouTube][9]  |
-| [`account-updatable`](./cosmwasm/contracts/updatable/) | account with rotatable pubkey                                | [YouTube][10] |
+| [`account-granter`](./cosmwasm/contracts/granter/)     | account with authz grant capability                          | [YouTube][10] |
+| [`account-updatable`](./cosmwasm/contracts/updatable/) | account with rotatable pubkey                                | [YouTube][11] |
 
 Two of them ("updatable" and "granter") have accompanied video demos; see the table above for YouTube links.
 
@@ -172,7 +172,7 @@ They are also used in unit tests of the module; see relevant test files for deta
 
 ## Copyright
 
-Abstract Account © 2023 [larry0x](11)
+Abstract Account © 2023 [larry0x](12)
 
 Materials in this repository are private properties owned solely by [larry0x](11). Distribution of these materials in any form, such as deployment onto blockchains, is prohibited without the express agreement from the owner.
 
@@ -184,6 +184,7 @@ Materials in this repository are private properties owned solely by [larry0x](11
 [6]: https://github.com/cosmos/cosmos-sdk/blob/v0.47.2/x/auth/ante/sigverify.go#L202-L205
 [7]: https://github.com/larry0x/abstract-account/blob/main/x/abstractaccount/ante.go#L46-L128
 [8]: https://github.com/larry0x/abstract-account/blob/main/x/abstractaccount/ante.go#L132-L173
-[9]: https://youtu.be/ofB53JgsWg0
-[10]: https://youtu.be/AdaLn28qG70
-[11]: https://twitter.com/larry0x
+[9]: https://youtu.be/XhszRNCVrpg
+[10]: https://youtu.be/ofB53JgsWg0
+[11]: https://youtu.be/AdaLn28qG70
+[12]: https://twitter.com/larry0x
