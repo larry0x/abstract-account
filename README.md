@@ -169,9 +169,11 @@ Two of them ("updatable" and "granter") have accompanied video demos; see the ta
 
 They are also used in unit tests of the module; see relevant test files for details.
 
-## License
+## Copyright
 
-TBD
+Abstract Account © 2023 [larry0x](11)
+
+Materials in this repository are private properties owned solely by [larry0x](11). Distribution of these materials in any form, such as deployment of onto blockchains, is prohibited without the express agreement from the owner.
 
 [1]: https://cosmwasm.com/
 [2]: https://eips.ethereum.org/EIPS/eip-2938
@@ -183,3 +185,4 @@ TBD
 [8]: https://github.com/larry0x/abstract-account/blob/main/x/abstractaccount/ante.go#L132-L173
 [9]: https://youtu.be/ofB53JgsWg0
 [10]: https://youtu.be/AdaLn28qG70
+[11]: https://twitter.com/larry0x
