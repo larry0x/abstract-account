@@ -30,7 +30,7 @@ impl From<MsgRegisterAccount> for CosmosMsg {
 }
 
 impl TypeUrl for MsgRegisterAccount {
-    const TYPE_URL: &'static str = "/abstractaccount.v1.MsgRegisterAccount";
+    const TYPE_URL: &'static str = "/larry.abstractaccount.v1.MsgRegisterAccount";
 }
 
 #[derive(Clone, PartialEq, prost::Message)]
@@ -43,7 +43,7 @@ pub struct MsgRegisterAccountResponse {
 }
 
 impl TypeUrl for MsgRegisterAccountResponse {
-    const TYPE_URL: &'static str = "/abstractaccount.v1.MsgRegisterAccountResponse";
+    const TYPE_URL: &'static str = "/larry.abstractaccount.v1.MsgRegisterAccountResponse";
 }
 
 // TODO: add definitions for AbstractAccount and NilPubKey
