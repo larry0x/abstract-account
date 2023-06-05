@@ -172,9 +172,7 @@ They are also used in unit tests of the module; see relevant test files for deta
 
 ## Copyright
 
-Abstract Account © 2023 [larry0x](12)
-
-Materials in this repository are private properties owned solely by [larry0x](11). Distribution of these materials in any form, such as deployment onto blockchains, is prohibited without the express agreement from the owner.
+(c) larry0x, 2023 - [All rights reserved](./LICENSE).
 
 [1]: https://cosmwasm.com/
 [2]: https://eips.ethereum.org/EIPS/eip-2938
@@ -187,4 +185,3 @@ Materials in this repository are private properties owned solely by [larry0x](11
 [9]: https://youtu.be/XhszRNCVrpg
 [10]: https://youtu.be/ofB53JgsWg0
 [11]: https://youtu.be/AdaLn28qG70
-[12]: https://twitter.com/larry0x
