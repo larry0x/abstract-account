@@ -170,7 +170,7 @@ Two of them ("updatable" and "granter") have accompanied video demos; see the ta
 
 They are also used in unit tests of the module; see relevant test files for details.
 
-## Copyright
+## License
 
 (c) larry0x, 2023 - [All rights reserved](./LICENSE).
 
