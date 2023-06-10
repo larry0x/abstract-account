@@ -256,8 +256,7 @@ func sudoWithGasLimit(
 	cacheCtx, write := ctx.CacheContext()
 	cacheCtx = cacheCtx.WithGasMeter(sdk.NewGasMeter(maxGas))
 
-	_, err := contractKeeper.Sudo(cacheCtx, contractAddr, msg)
-	if err != nil {
+	if _, err := contractKeeper.Sudo(cacheCtx, contractAddr, msg); err != nil {
 		return err
 	}
 
