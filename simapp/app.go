@@ -59,7 +59,7 @@ import (
 )
 
 const (
-	appName = "SimApp"
+	AppName = "SimApp"
 
 	// A random account I created to serve as the authority for modules, since
 	// this simapp doesn't have a gov module.
@@ -70,7 +70,7 @@ const (
 	// human   cotton romance fork    mountain rapid
 	// scan    swarm  basic   subject tornado  genius
 	// parade  stone  coyote  pluck   journey  fatal
-	authority = "cosmos1tqr9a9m9nk0c22uq2c2slundmqhtnrnhwks7x0"
+	Authority = "cosmos1tqr9a9m9nk0c22uq2c2slundmqhtnrnhwks7x0"
 )
 
 var (
@@ -139,7 +139,7 @@ func NewSimApp(
 	encCfg := MakeEncodingConfig()
 
 	bApp := baseapp.NewBaseApp(
-		appName,
+		AppName,
 		logger,
 		db,
 		encCfg.TxConfig.TxDecoder(),
@@ -175,7 +175,7 @@ func NewSimApp(
 	app.ConsensusParamsKeeper = consensusparamkeeper.NewKeeper(
 		app.cdc,
 		keys[consensusparamtypes.StoreKey],
-		authority,
+		Authority,
 	)
 	app.SetParamStore(&app.ConsensusParamsKeeper)
 
@@ -185,7 +185,7 @@ func NewSimApp(
 		authtypes.ProtoBaseAccount,
 		maccPerms,
 		sdk.Bech32MainPrefix,
-		authority,
+		Authority,
 	)
 
 	app.BankKeeper = bankkeeper.NewBaseKeeper(
@@ -193,7 +193,7 @@ func NewSimApp(
 		keys[banktypes.StoreKey],
 		app.AccountKeeper,
 		blockedAddresses(),
-		authority,
+		Authority,
 	)
 
 	wasmDir, wasmCfg, wasmCapabilities := wasmParams(appOpts)
@@ -214,7 +214,7 @@ func NewSimApp(
 		wasmDir,
 		wasmCfg,
 		wasmCapabilities,
-		authority,
+		Authority,
 		wasmOpts...,
 	)
 
@@ -226,7 +226,7 @@ func NewSimApp(
 		// or modify code access config) but wasm module doesn't seem to allow us
 		// to create our own authorization policy
 		wasmkeeper.NewGovPermissionKeeper(app.WasmKeeper),
-		authority,
+		Authority,
 	)
 
 	app.ModuleManager = module.NewManager(
