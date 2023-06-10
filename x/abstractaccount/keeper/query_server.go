@@ -16,7 +16,7 @@ func NewQueryServerImpl(k Keeper) types.QueryServer {
 	return &queryServer{k}
 }
 
-func (qs queryServer) Params(goCtx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+func (qs queryServer) Params(goCtx context.Context, _ *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	params, err := qs.k.GetParams(ctx)
