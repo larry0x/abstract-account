@@ -7,7 +7,30 @@ import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 )
 
-var _ sdk.Msg = &MsgRegisterAccount{}
+var (
+	_ sdk.Msg = &MsgUpdateParams{}
+	_ sdk.Msg = &MsgRegisterAccount{}
+)
+
+// ------------------------------- UpdateParams --------------------------------
+
+func (m *MsgUpdateParams) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(m.Sender); err != nil {
+		return sdkerrors.ErrInvalidRequest.Wrap("invalid sender address")
+	}
+
+	return nil
+}
+
+func (m *MsgUpdateParams) GetSigners() []sdk.AccAddress {
+	// We've already asserted the sender address is valid in ValidateBasic, so we
+	// can safety ignore the error here.
+	senderAddr, _ := sdk.AccAddressFromBech32(m.Sender)
+
+	return []sdk.AccAddress{senderAddr}
+}
+
+// ------------------------------ RegisterAccount ------------------------------
 
 func (m *MsgRegisterAccount) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(m.Sender); err != nil {

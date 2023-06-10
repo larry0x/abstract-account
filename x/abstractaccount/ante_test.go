@@ -254,3 +254,7 @@ func TestAfterTx(t *testing.T) {
 	_, err = decorator.PostHandle(ctx, tx, false, true, postTerminator)
 	require.NoError(t, err)
 }
+
+func TestMaxGas(t *testing.T) {
+	// TODO
+}

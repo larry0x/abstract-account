@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
@@ -14,15 +15,17 @@ import (
 )
 
 type Keeper struct {
-	cdc      codec.BinaryCodec
-	storeKey storetypes.StoreKey
-	ak       authkeeper.AccountKeeperI
-	ck       wasmtypes.ContractOpsKeeper
+	cdc       codec.BinaryCodec
+	storeKey  storetypes.StoreKey
+	ak        authkeeper.AccountKeeperI
+	ck        wasmtypes.ContractOpsKeeper
+	authority string
 }
 
 func NewKeeper(
 	cdc codec.BinaryCodec, storeKey storetypes.StoreKey,
 	ak authkeeper.AccountKeeperI, ck wasmtypes.ContractOpsKeeper,
+	authority string,
 ) Keeper {
 	if ak == nil {
 		panic("AccountKeeperI cannot be nil")
@@ -32,7 +35,7 @@ func NewKeeper(
 		panic("ContractOpsKeeper cannot be nil")
 	}
 
-	return Keeper{cdc, storeKey, ak, ck}
+	return Keeper{cdc, storeKey, ak, ck, authority}
 }
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
@@ -41,6 +44,37 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 func (k Keeper) ContractKeeper() wasmtypes.ContractOpsKeeper {
 	return k.ck
+}
+
+// ---------------------------------- Params -----------------------------------
+
+func (k Keeper) GetParams(ctx sdk.Context) (*types.Params, error) {
+	store := ctx.KVStore(k.storeKey)
+
+	bz := store.Get(types.KeyParams)
+	if bz == nil {
+		return nil, sdkerrors.ErrNotFound.Wrap("x/abstractaccount module params")
+	}
+
+	var params types.Params
+	if err := k.cdc.Unmarshal(bz, &params); err != nil {
+		return nil, types.ErrParsingParams.Wrap(err.Error())
+	}
+
+	return &params, nil
+}
+
+func (k Keeper) SetParams(ctx sdk.Context, params *types.Params) error {
+	store := ctx.KVStore(k.storeKey)
+
+	bz, err := k.cdc.Marshal(params)
+	if err != nil {
+		return types.ErrParsingParams.Wrap(err.Error())
+	}
+
+	store.Set(types.KeyParams, bz)
+
+	return nil
 }
 
 // ------------------------------- NextAccountId -------------------------------

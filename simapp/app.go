@@ -226,6 +226,7 @@ func NewSimApp(
 		// or modify code access config) but wasm module doesn't seem to allow us
 		// to create our own authorization policy
 		wasmkeeper.NewGovPermissionKeeper(app.WasmKeeper),
+		authority,
 	)
 
 	app.ModuleManager = module.NewManager(

@@ -1,6 +1,7 @@
 syntax = "proto3";
 package larry.abstractaccount.v1;
 
+import "abstractaccount/v1/params.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/msg/v1/msg.proto";
 import "gogoproto/gogo.proto";
@@ -10,15 +11,29 @@ option go_package = "github.com/larry0x/abstract-account/x/abstractaccount/types
 service Msg {
   option (cosmos.msg.v1.service) = true;
 
+  // Update the module's parameters. Can only be called by the authority.
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+
   // Register a new abstract account by instantiating a new CosmWasm smart
   // contract.
   rpc RegisterAccount(MsgRegisterAccount) returns (MsgRegisterAccountResponse);
 }
 
+// ------------------------------- UpdateParams --------------------------------
+
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string sender = 1;
+  Params params = 2;
+}
+
+message MsgUpdateParamsResponse {}
+
+// ------------------------------ RegisterAccount ------------------------------
+
 message MsgRegisterAccount {
-  option (cosmos.msg.v1.signer)      = "sender";
-  option (gogoproto.equal)           = false;
-  option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "sender";
 
   // Sender is the actor who signs the message
   string sender  = 1;

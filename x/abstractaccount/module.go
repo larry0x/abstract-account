@@ -60,7 +60,7 @@ func (AppModuleBasic) GetTxCmd() *cobra.Command {
 }
 
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-	return nil
+	return cli.GetQueryCmd()
 }
 
 // --------------------------------- AppModule ---------------------------------
@@ -80,6 +80,7 @@ func (AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {
 
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServerImpl(am.keeper))
 }
 
 func (AppModule) ConsensusVersion() uint64 {

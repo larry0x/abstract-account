@@ -28,6 +28,10 @@ var (
 	acctRegisterFunds  = sdk.NewCoins(sdk.NewCoin(simapptesting.DefaultBondDenom, sdk.NewInt(88888)))
 )
 
+func TestUpdateParams(t *testing.T) {
+	// TODO
+}
+
 func TestRegisterAccount(t *testing.T) {
 	app := simapptesting.MakeMockApp([]banktypes.Balance{
 		{

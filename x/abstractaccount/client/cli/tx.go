@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -31,7 +32,45 @@ func GetTxCmd() *cobra.Command {
 		SilenceUsage:               true,
 	}
 
-	cmd.AddCommand(registerCmd())
+	cmd.AddCommand(
+		updateParamsCmd(),
+		registerCmd(),
+	)
+
+	return cmd
+}
+
+func updateParamsCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update-params [json-encoded-params]",
+		Short: "Update the module's parameters",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			var params types.Params
+			if err = json.Unmarshal([]byte(args[0]), &params); err != nil {
+				return err
+			}
+
+			msg := &types.MsgUpdateParams{
+				Sender: clientCtx.GetFromAddress().String(),
+				Params: &params,
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+		SilenceUsage: true,
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
 }
