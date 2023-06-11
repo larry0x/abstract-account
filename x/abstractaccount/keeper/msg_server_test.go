@@ -12,6 +12,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
 	"github.com/larry0x/abstract-account/simapp"
 	simapptesting "github.com/larry0x/abstract-account/simapp/testing"
 	"github.com/larry0x/abstract-account/x/abstractaccount/keeper"
@@ -36,17 +38,17 @@ func TestRegisterAccount(t *testing.T) {
 		expOk  bool
 	}{
 		{
-			desc:   "all code IDs whitelisted",
+			desc:   "all code IDs allowed",
 			params: &types.Params{AllowAllCodeIDs: true, AllowedCodeIDs: []uint64{}},
 			expOk:  true,
 		},
 		{
-			desc:   "code ID is whitelisted",
+			desc:   "code ID is allowed",
 			params: &types.Params{AllowAllCodeIDs: false, AllowedCodeIDs: []uint64{1}},
 			expOk:  true,
 		},
 		{
-			desc:   "all code IDs whitelisted",
+			desc:   "all code IDs allowed",
 			params: &types.Params{AllowAllCodeIDs: false, AllowedCodeIDs: []uint64{888, 999, 69420}},
 			expOk:  false,
 		},
@@ -67,28 +69,100 @@ func TestRegisterAccount(t *testing.T) {
 			Time: time.Now(),
 		})
 
+		// set params
 		k := app.AbstractAccountKeeper
 		k.SetParams(ctx, tc.params)
-		msgServer := keeper.NewMsgServerImpl(k)
 
-		// store code. codeID should be 1
-		codeID, _, err := k.ContractKeeper().Create(ctx, user, testdata.AccountWasm, nil)
+		// store code
+		codeID, err := storeCode(ctx, k.ContractKeeper())
 		require.NoError(t, err)
 		require.Equal(t, uint64(1), codeID)
 
-		// prepare the contract instantiate msg
-		msgBytes, err := json.Marshal(&AccountInitMsg{
-			PubKey: simapptesting.MakeRandomPubKey().Bytes(),
+		// register account
+		accAddr, err := registerAccount(ctx, keeper.NewMsgServerImpl(k), codeID)
+
+		if tc.expOk {
+			require.NoError(t, err)
+		} else {
+			require.Error(t, err)
+			return
+		}
+
+		// check the contract info is correct
+		contractInfo := app.WasmKeeper.GetContractInfo(ctx, accAddr)
+		require.Equal(t, codeID, contractInfo.CodeID)
+		require.Equal(t, user.String(), contractInfo.Creator)
+		require.Equal(t, app.AbstractAccountKeeper.ModuleAddress().String(), contractInfo.Admin)
+		require.Equal(t, fmt.Sprintf("%s/%d", types.ModuleName, k.GetNextAccountID(ctx)-1), contractInfo.Label)
+
+		// make sure an AbstractAccount has been created
+		_, ok := app.AccountKeeper.GetAccount(ctx, accAddr).(*types.AbstractAccount)
+		require.True(t, ok)
+
+		// make sure the contract has received the funds
+		balance := app.BankKeeper.GetAllBalances(ctx, accAddr)
+		require.Equal(t, acctRegisterFunds, balance)
+	}
+}
+
+func TestMigrateAccount(t *testing.T) {
+	for _, tc := range []struct {
+		desc   string
+		params *types.Params
+		expOk  bool
+	}{
+		{
+			desc:   "all code IDs are allowed",
+			params: &types.Params{AllowAllCodeIDs: true, AllowedCodeIDs: []uint64{}},
+			expOk:  true,
+		},
+		{
+			desc:   "migrate to an allowed code ID",
+			params: &types.Params{AllowAllCodeIDs: false, AllowedCodeIDs: []uint64{1, 2}},
+			expOk:  true,
+		},
+		{
+			desc:   "migrate to an disallowed code ID",
+			params: &types.Params{AllowAllCodeIDs: false, AllowedCodeIDs: []uint64{1, 888, 999, 69420}},
+			expOk:  false,
+		},
+	} {
+		app := simapptesting.MakeMockApp([]banktypes.Balance{
+			{
+				Address: user.String(),
+				Coins:   userInitialBalance,
+			},
 		})
+
+		ctx := app.NewContext(false, tmproto.Header{Time: time.Now()})
+
+		// set params
+		k := app.AbstractAccountKeeper
+		k.SetParams(ctx, tc.params)
+
+		msgServer := keeper.NewMsgServerImpl(k)
+
+		// store code
+		// we will register the account using this one
+		codeID, err := storeCode(ctx, k.ContractKeeper())
+		require.NoError(t, err)
+		require.Equal(t, uint64(1), codeID)
+
+		// store code again, get a different code ID
+		// we will attempt to migrate to this one
+		newCodeID, err := storeCode(ctx, k.ContractKeeper())
+		require.NoError(t, err)
+		require.Equal(t, uint64(2), newCodeID)
+
+		// register account
+		accAddr, err := registerAccount(ctx, msgServer, codeID)
 		require.NoError(t, err)
 
-		// register the account
-		res, err := msgServer.RegisterAccount(ctx, &types.MsgRegisterAccount{
-			Sender: user.String(),
-			CodeID: codeID,
-			Msg:    msgBytes,
-			Funds:  acctRegisterFunds,
-			Salt:   []byte("hello"),
+		// attempt to migrate account
+		_, err = msgServer.MigrateAccount(ctx, &types.MsgMigrateAccount{
+			Sender: accAddr.String(),
+			CodeID: newCodeID,
+			Msg:    []byte("{}"),
 		})
 
 		if tc.expOk {
@@ -98,28 +172,10 @@ func TestRegisterAccount(t *testing.T) {
 			return
 		}
 
-		contractAddr, err := sdk.AccAddressFromBech32(res.Address)
-		require.NoError(t, err)
-
-		// check the contract info is correct
-		contractInfo := app.WasmKeeper.GetContractInfo(ctx, contractAddr)
-		require.Equal(t, codeID, contractInfo.CodeID)
-		require.Equal(t, user.String(), contractInfo.Creator)
-		require.Equal(t, app.AbstractAccountKeeper.ModuleAddress().String(), contractInfo.Admin)
-		require.Equal(t, fmt.Sprintf("%s/%d", types.ModuleName, k.GetNextAccountID(ctx)-1), contractInfo.Label)
-
-		// make sure an AbstractAccount has been created
-		_, ok := app.AccountKeeper.GetAccount(ctx, contractAddr).(*types.AbstractAccount)
-		require.True(t, ok)
-
-		// make sure the contract has received the funds
-		balance := app.BankKeeper.GetAllBalances(ctx, contractAddr)
-		require.Equal(t, acctRegisterFunds, balance)
+		// check the code ID has been updated
+		contractInfo := app.WasmKeeper.GetContractInfo(ctx, accAddr)
+		require.Equal(t, newCodeID, contractInfo.CodeID)
 	}
-}
-
-func TestMigrateAccount(t *testing.T) {
-	// TODO
 }
 
 func TestUpdateParams(t *testing.T) {
@@ -172,4 +228,34 @@ func TestUpdateParams(t *testing.T) {
 			require.Equal(t, tc.newParams, paramsAfter)
 		}
 	}
+}
+
+// ---------------------------------- Helpers ----------------------------------
+
+func storeCode(ctx sdk.Context, contractKeeper wasmtypes.ContractOpsKeeper) (uint64, error) {
+	codeID, _, err := contractKeeper.Create(ctx, user, testdata.AccountWasm, nil)
+
+	return codeID, err
+}
+
+func registerAccount(ctx sdk.Context, msgServer types.MsgServer, codeID uint64) (sdk.AccAddress, error) {
+	msgBytes, err := json.Marshal(&AccountInitMsg{
+		PubKey: simapptesting.MakeRandomPubKey().Bytes(),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := msgServer.RegisterAccount(ctx, &types.MsgRegisterAccount{
+		Sender: user.String(),
+		CodeID: codeID,
+		Msg:    msgBytes,
+		Funds:  acctRegisterFunds,
+		Salt:   []byte("hello"),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return sdk.AccAddressFromBech32(res.Address)
 }
