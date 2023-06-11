@@ -17,20 +17,16 @@ import (
 type Keeper struct {
 	cdc       codec.BinaryCodec
 	storeKey  storetypes.StoreKey
-	ak        authkeeper.AccountKeeperI
+	ak        authkeeper.AccountKeeper
 	ck        wasmtypes.ContractOpsKeeper
 	authority string
 }
 
 func NewKeeper(
 	cdc codec.BinaryCodec, storeKey storetypes.StoreKey,
-	ak authkeeper.AccountKeeperI, ck wasmtypes.ContractOpsKeeper,
+	ak authkeeper.AccountKeeper, ck wasmtypes.ContractOpsKeeper,
 	authority string,
 ) Keeper {
-	if ak == nil {
-		panic("AccountKeeperI cannot be nil")
-	}
-
 	if ck == nil {
 		panic("ContractOpsKeeper cannot be nil")
 	}
@@ -44,6 +40,10 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 func (k Keeper) ContractKeeper() wasmtypes.ContractOpsKeeper {
 	return k.ck
+}
+
+func (k Keeper) ModuleAddress() sdk.AccAddress {
+	return k.ak.GetModuleAddress(types.ModuleName)
 }
 
 // ---------------------------------- Params -----------------------------------

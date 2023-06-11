@@ -22,5 +22,23 @@ func (p *Params) Validate() error {
 		return ErrZeroMaxGas
 	}
 
+	if p.AllowAllCodeIDs && len(p.AllowedCodeIDs) > 0 {
+		return ErrInvalidAllowedCodeIDs
+	}
+
 	return nil
+}
+
+func (p *Params) IsAllowedCodeID(codeID uint64) bool {
+	if p.AllowAllCodeIDs {
+		return true
+	}
+
+	for _, allowedCodeID := range p.AllowedCodeIDs {
+		if codeID == allowedCodeID {
+			return true
+		}
+	}
+
+	return false
 }

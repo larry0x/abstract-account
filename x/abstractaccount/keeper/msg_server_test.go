@@ -29,58 +29,6 @@ var (
 	acctRegisterFunds  = sdk.NewCoins(sdk.NewCoin(simapptesting.DefaultBondDenom, sdk.NewInt(88888)))
 )
 
-func TestUpdateParams(t *testing.T) {
-	for _, tc := range []struct {
-		desc      string
-		sender    string
-		newParams *types.Params
-		expErr    bool
-	}{
-		{
-			desc:      "sender is not authority",
-			sender:    user.String(),
-			newParams: types.DefaultParams(),
-			expErr:    true,
-		},
-		{
-			desc:      "invalid params",
-			sender:    simapp.Authority,
-			newParams: &types.Params{MaxGasBefore: 88888, MaxGasAfter: 0},
-			expErr:    true,
-		},
-		{
-			desc:      "sender is authority and params are valid",
-			sender:    simapp.Authority,
-			newParams: &types.Params{MaxGasBefore: 88888, MaxGasAfter: 99999},
-			expErr:    false,
-		},
-	} {
-		app := simapptesting.MakeMockApp([]banktypes.Balance{})
-		ctx := app.NewContext(false, tmproto.Header{})
-
-		msgServer := keeper.NewMsgServerImpl(app.AbstractAccountKeeper)
-
-		paramsBefore, err1 := app.AbstractAccountKeeper.GetParams(ctx)
-		require.NoError(t, err1)
-
-		_, err2 := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
-			Sender: tc.sender,
-			Params: tc.newParams,
-		})
-
-		paramsAfter, err3 := app.AbstractAccountKeeper.GetParams(ctx)
-		require.NoError(t, err3)
-
-		if tc.expErr {
-			require.Error(t, err2)
-			require.Equal(t, paramsBefore, paramsAfter)
-		} else {
-			require.NoError(t, err2)
-			require.Equal(t, tc.newParams, paramsAfter)
-		}
-	}
-}
-
 func TestRegisterAccount(t *testing.T) {
 	app := simapptesting.MakeMockApp([]banktypes.Balance{
 		{
@@ -138,4 +86,60 @@ func TestRegisterAccount(t *testing.T) {
 	// make sure the contract has received the funds
 	balance := app.BankKeeper.GetAllBalances(ctx, contractAddr)
 	require.Equal(t, acctRegisterFunds, balance)
+}
+
+func TestMigrateAccount(t *testing.T) {
+	// TODO
+}
+
+func TestUpdateParams(t *testing.T) {
+	for _, tc := range []struct {
+		desc      string
+		sender    string
+		newParams *types.Params
+		expErr    bool
+	}{
+		{
+			desc:      "sender is not authority",
+			sender:    user.String(),
+			newParams: types.DefaultParams(),
+			expErr:    true,
+		},
+		{
+			desc:      "invalid params",
+			sender:    simapp.Authority,
+			newParams: &types.Params{MaxGasBefore: 88888, MaxGasAfter: 0},
+			expErr:    true,
+		},
+		{
+			desc:      "sender is authority and params are valid",
+			sender:    simapp.Authority,
+			newParams: &types.Params{MaxGasBefore: 88888, MaxGasAfter: 99999},
+			expErr:    false,
+		},
+	} {
+		app := simapptesting.MakeMockApp([]banktypes.Balance{})
+		ctx := app.NewContext(false, tmproto.Header{})
+
+		msgServer := keeper.NewMsgServerImpl(app.AbstractAccountKeeper)
+
+		paramsBefore, err1 := app.AbstractAccountKeeper.GetParams(ctx)
+		require.NoError(t, err1)
+
+		_, err2 := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
+			Sender: tc.sender,
+			Params: tc.newParams,
+		})
+
+		paramsAfter, err3 := app.AbstractAccountKeeper.GetParams(ctx)
+		require.NoError(t, err3)
+
+		if tc.expErr {
+			require.Error(t, err2)
+			require.Equal(t, paramsBefore, paramsAfter)
+		} else {
+			require.NoError(t, err2)
+			require.Equal(t, tc.newParams, paramsAfter)
+		}
+	}
 }
