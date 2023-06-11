@@ -33,44 +33,10 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		updateParamsCmd(),
 		registerCmd(),
+		migrateCmd(),
+		updateParamsCmd(),
 	)
-
-	return cmd
-}
-
-func updateParamsCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "update-params [json-encoded-params]",
-		Short: "Update the module's parameters",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			var params types.Params
-			if err = json.Unmarshal([]byte(args[0]), &params); err != nil {
-				return err
-			}
-
-			msg := &types.MsgUpdateParams{
-				Sender: clientCtx.GetFromAddress().String(),
-				Params: &params,
-			}
-
-			if err := msg.ValidateBasic(); err != nil {
-				return err
-			}
-
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
-		},
-		SilenceUsage: true,
-	}
-
-	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
 }
@@ -132,6 +98,77 @@ func registerCmd() *cobra.Command {
 
 	cmd.Flags().String(flagSalt, "", "Salt value used in determining account address")
 	cmd.Flags().String(flagFunds, "", "Coins to send to the account during instantiation")
+
+	return cmd
+}
+
+func migrateCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "migrate [code-id] [msg]",
+		Short: "Migrate an abstract account",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			codeID, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			msg := &types.MsgMigrateAccount{
+				Sender: clientCtx.GetFromAddress().String(),
+				CodeID: codeID,
+				Msg:    []byte(args[1]),
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+		SilenceUsage: true,
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func updateParamsCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update-params [json-encoded-params]",
+		Short: "Update the module's parameters",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			var params types.Params
+			if err = json.Unmarshal([]byte(args[0]), &params); err != nil {
+				return err
+			}
+
+			msg := &types.MsgUpdateParams{
+				Sender: clientCtx.GetFromAddress().String(),
+				Params: &params,
+			}
+
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+		SilenceUsage: true,
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
 }

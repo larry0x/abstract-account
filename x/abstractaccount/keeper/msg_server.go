@@ -20,26 +20,20 @@ func NewMsgServerImpl(k Keeper) types.MsgServer {
 	return &msgServer{k}
 }
 
-func (ms msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	if req.Sender != ms.k.authority {
-		return nil, sdkerrors.ErrUnauthorized.Wrapf("sender is not authority: expect %s, found %s", ms.k.authority, req.Sender)
-	}
-
-	if err := req.Params.Validate(); err != nil {
-		return nil, err
-	}
-
-	if err := ms.k.SetParams(ctx, req.Params); err != nil {
-		return nil, err
-	}
-
-	return &types.MsgUpdateParamsResponse{}, nil
-}
+// ------------------------------ RegisterAccount ------------------------------
 
 func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegisterAccount) (*types.MsgRegisterAccountResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	params, err := ms.k.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// ensure that only allowed code IDs can be used to instantiate new accounts
+	if !params.IsAllowedCodeID(req.CodeID) {
+		return nil, types.ErrNotAllowedCodeID
+	}
 
 	senderAddr, err := sdk.AccAddressFromBech32(req.Sender)
 	if err != nil {
@@ -50,7 +44,13 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 		ctx,
 		req.CodeID,
 		senderAddr,
-		senderAddr,
+		// set module account as the admin
+		//
+		// previously we set the AbstractAccount itself as the admin. however, now
+		// we want to enforce the code ID whitelist, we cannot allow the account to
+		// migrate itself without the module's permission. therefore, now we set the
+		// module account as admin, and provide a new MigrateAccount method.
+		ms.k.ModuleAddress(),
 		req.Msg,
 		fmt.Sprintf("%s/%d", types.ModuleName, ms.k.GetAndIncrementNextAccountID(ctx)),
 		req.Funds,
@@ -62,11 +62,6 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 		false,
 	)
 	if err != nil {
-		return nil, err
-	}
-
-	// set the contract's admin to itself
-	if err = ms.k.ck.UpdateContractAdmin(ctx, contractAddr, senderAddr, contractAddr); err != nil {
 		return nil, err
 	}
 
@@ -96,4 +91,71 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 	)
 
 	return &types.MsgRegisterAccountResponse{Address: contractAddr.String(), Data: data}, nil
+}
+
+// ------------------------------ MigrateAccount -------------------------------
+
+func (ms msgServer) MigrateAccount(goCtx context.Context, req *types.MsgMigrateAccount) (*types.MsgMigrateAccountResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	params, err := ms.k.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// ensure that accounts can only be migrated to allowed code IDs
+	if !params.IsAllowedCodeID(req.CodeID) {
+		return nil, types.ErrNotAllowedCodeID
+	}
+
+	accAddr, err := sdk.AccAddressFromBech32(req.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	// ensure that the account is indeed an AbstractAccount
+	if _, ok := ms.k.ak.GetAccount(ctx, accAddr).(*types.AbstractAccount); !ok {
+		return nil, types.ErrNotAbstractAccount
+	}
+
+	data, err := ms.k.ContractKeeper().Migrate(ctx, accAddr, ms.k.ModuleAddress(), req.CodeID, req.Msg)
+	if err != nil {
+		return nil, err
+	}
+
+	ms.k.Logger(ctx).Info(
+		"account migrated",
+		types.AttributeKeyContractAddr, accAddr.String(),
+		types.AttributeKeyCodeID, req.CodeID,
+	)
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeAccountMigrated,
+			sdk.NewAttribute(types.AttributeKeyContractAddr, accAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyCodeID, strconv.FormatUint(req.CodeID, 10)),
+		),
+	)
+
+	return &types.MsgMigrateAccountResponse{Data: data}, nil
+}
+
+// ------------------------------- UpdateParams --------------------------------
+
+func (ms msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if req.Sender != ms.k.authority {
+		return nil, sdkerrors.ErrUnauthorized.Wrapf("sender is not authority: expect %s, found %s", ms.k.authority, req.Sender)
+	}
+
+	if err := req.Params.Validate(); err != nil {
+		return nil, err
+	}
+
+	if err := ms.k.SetParams(ctx, req.Params); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateParamsResponse{}, nil
 }

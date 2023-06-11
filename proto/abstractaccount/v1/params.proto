@@ -1,18 +1,32 @@
 syntax = "proto3";
 package larry.abstractaccount.v1;
 
+import "gogoproto/gogo.proto";
+
 option go_package = "github.com/larry0x/abstract-account/x/abstractaccount/types";
 
 message Params {
+  // AllowAllCodeIDs describes whether to allow any code IDs to be used when
+  // instantiating new AbstractAccounts, or migrating existing AbstractAccounts.
+  //
+  // If set to true, the AllowedCodeIDs list must be empty.
+  bool allow_all_code_ids = 1 [(gogoproto.customname) = "AllowAllCodeIDs"];
+
+  // AllowedCodeIDs is an exhausitive list of code IDs that can be used when
+  // instantiating new AbstractAccounts, or migrating existing AbstractAccounts./
+  //
+  // Must be empty if AllowAllCodeIDs is set to true.
+  repeated uint64 allowed_code_ids = 2 [(gogoproto.customname) = "AllowedCodeIDs"];
+
   // MaxGasBefore is the maximum amount of gas that can be consumed by the
   // contract call in the before_tx decorator.
   //
   // Must be greater than zero.
-  uint64 max_gas_before = 1;
+  uint64 max_gas_before = 3;
 
   // MaxGasAfter is the maximum amount of gas that can be consumed by the
   // contract call in the after_tx decorator.
   //
   // Must be greater than zero.
-  uint64 max_gas_after = 2;
+  uint64 max_gas_after = 4;
 }

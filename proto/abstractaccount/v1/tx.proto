@@ -11,24 +11,15 @@ option go_package = "github.com/larry0x/abstract-account/x/abstractaccount/types
 service Msg {
   option (cosmos.msg.v1.service) = true;
 
+  // Register a new AbstractAccount.
+  rpc RegisterAccount(MsgRegisterAccount) returns (MsgRegisterAccountResponse);
+
+  // Migrate an existing AbstractAccount to a new code ID.
+  rpc MigrateAccount(MsgMigrateAccount) returns (MsgMigrateAccountResponse);
+
   // Update the module's parameters. Can only be called by the authority.
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
-
-  // Register a new abstract account by instantiating a new CosmWasm smart
-  // contract.
-  rpc RegisterAccount(MsgRegisterAccount) returns (MsgRegisterAccountResponse);
 }
-
-// ------------------------------- UpdateParams --------------------------------
-
-message MsgUpdateParams {
-  option (cosmos.msg.v1.signer) = "sender";
-
-  string sender = 1;
-  Params params = 2;
-}
-
-message MsgUpdateParamsResponse {}
 
 // ------------------------------ RegisterAccount ------------------------------
 
@@ -61,3 +52,35 @@ message MsgRegisterAccountResponse {
   string address = 1;
   bytes  data    = 2;
 }
+
+// ------------------------------ MigrateAccount -------------------------------
+
+message MsgMigrateAccount {
+  option (cosmos.msg.v1.signer) = "sender";
+
+  // Sender is the account that is to be migrated
+  string sender = 1;
+
+  // CodeID is the code ID that the account is to be migrated to
+  uint64 code_id = 2 [(gogoproto.customname) = "CodeID"];
+
+  // Msg is the JSON-encoded migrate message for the contract
+  bytes msg = 3 [
+    (gogoproto.casttype) = "github.com/CosmWasm/wasmd/x/wasm/types.RawContractMessage"
+  ];
+}
+
+message MsgMigrateAccountResponse {
+  bytes data = 1;
+}
+
+// ------------------------------- UpdateParams --------------------------------
+
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "sender";
+
+  string sender = 1;
+  Params params = 2;
+}
+
+message MsgUpdateParamsResponse {}
