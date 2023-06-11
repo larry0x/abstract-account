@@ -1,0 +1,23 @@
+syntax = "proto3";
+package larry.abstractaccount.v1;
+
+import "abstractaccount/v1/params.proto";
+import "cosmos/query/v1/query.proto";
+import "google/api/annotations.proto";
+
+option go_package = "github.com/larry0x/abstract-account/x/abstractaccount/types";
+
+service Query {
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
+    option (google.api.http).get               = "/larry/abstractaccount/v1/params";
+  }
+}
+
+// ---------------------------------- Params -----------------------------------
+
+message QueryParamsRequest {}
+
+message QueryParamsResponse {
+  Params params = 1;
+}

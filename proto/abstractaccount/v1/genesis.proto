@@ -1,8 +1,11 @@
 syntax = "proto3";
 package larry.abstractaccount.v1;
 
+import "abstractaccount/v1/params.proto";
+
 option go_package = "github.com/larry0x/abstract-account/x/abstractaccount/types";
 
 message GenesisState {
-  uint64 next_account_id = 1;
+  Params params          = 1;
+  uint64 next_account_id = 2;
 }

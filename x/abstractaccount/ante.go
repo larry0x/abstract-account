@@ -12,6 +12,8 @@ import (
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+
 	"github.com/larry0x/abstract-account/x/abstractaccount/keeper"
 	"github.com/larry0x/abstract-account/x/abstractaccount/types"
 )
@@ -120,8 +122,12 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 		return ctx, err
 	}
 
-	_, err = d.aak.ContractKeeper().Sudo(ctx, signerAcc.GetAddress(), sudoMsgBytes)
+	params, err := d.aak.GetParams(ctx)
 	if err != nil {
+		return ctx, err
+	}
+
+	if err := sudoWithGasLimit(ctx, d.aak.ContractKeeper(), signerAcc.GetAddress(), sudoMsgBytes, params.MaxGasBefore); err != nil {
 		return ctx, err
 	}
 
@@ -238,4 +244,24 @@ func sdkMsgsToAnys(msgs []sdk.Msg) ([]*types.Any, error) {
 	}
 
 	return anys, nil
+}
+
+// Call a contract's sudo entry point with a gas limit.
+// Copied from Osmosis' protorev posthandler:
+// https://github.com/osmosis-labs/osmosis/blob/98025f185ab2ee1b060511ed22679112abcc08fa/x/protorev/keeper/posthandler.go#L42-L43
+func sudoWithGasLimit(
+	ctx sdk.Context, contractKeeper wasmtypes.ContractOpsKeeper,
+	contractAddr sdk.AccAddress, msg []byte, maxGas sdk.Gas,
+) error {
+	cacheCtx, write := ctx.CacheContext()
+	cacheCtx = cacheCtx.WithGasMeter(sdk.NewGasMeter(maxGas))
+
+	if _, err := contractKeeper.Sudo(cacheCtx, contractAddr, msg); err != nil {
+		return err
+	}
+
+	write()
+	ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
+
+	return nil
 }

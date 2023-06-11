@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/larry0x/abstract-account/x/abstractaccount/types"
@@ -17,6 +18,24 @@ type msgServer struct {
 
 func NewMsgServerImpl(k Keeper) types.MsgServer {
 	return &msgServer{k}
+}
+
+func (ms msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if req.Sender != ms.k.authority {
+		return nil, sdkerrors.ErrUnauthorized.Wrapf("sender is not authority: expect %s, found %s", ms.k.authority, req.Sender)
+	}
+
+	if err := req.Params.Validate(); err != nil {
+		return nil, err
+	}
+
+	if err := ms.k.SetParams(ctx, req.Params); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateParamsResponse{}, nil
 }
 
 func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegisterAccount) (*types.MsgRegisterAccountResponse, error) {
@@ -61,7 +80,7 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 	ms.k.ak.SetAccount(ctx, types.NewAbstractAccountFromAccount(acc))
 
 	ms.k.Logger(ctx).Info(
-		"abstract account registered",
+		"account registered",
 		types.AttributeKeyCreator, req.Sender,
 		types.AttributeKeyCodeID, req.CodeID,
 		types.AttributeKeyContractAddr, contractAddr.String(),

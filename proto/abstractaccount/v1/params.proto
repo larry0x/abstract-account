@@ -1,0 +1,18 @@
+syntax = "proto3";
+package larry.abstractaccount.v1;
+
+option go_package = "github.com/larry0x/abstract-account/x/abstractaccount/types";
+
+message Params {
+  // MaxGasBefore is the maximum amount of gas that can be consumed by the
+  // contract call in the before_tx decorator.
+  //
+  // Must be greater than zero.
+  uint64 max_gas_before = 1;
+
+  // MaxGasAfter is the maximum amount of gas that can be consumed by the
+  // contract call in the after_tx decorator.
+  //
+  // Must be greater than zero.
+  uint64 max_gas_after = 2;
+}

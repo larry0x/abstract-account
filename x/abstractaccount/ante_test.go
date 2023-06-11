@@ -131,7 +131,9 @@ func TestBeforeTx(t *testing.T) {
 		chainID  string
 		accNum   uint64
 		seq      uint64
+		maxGas   uint64
 		expOk    bool
+		expPanic bool
 	}{
 		{
 			desc:     "tx signed with the correct key",
@@ -139,7 +141,9 @@ func TestBeforeTx(t *testing.T) {
 			chainID:  mockChainID,
 			accNum:   mockAccNum,
 			seq:      mockSeq,
+			maxGas:   types.DefaultMaxGas,
 			expOk:    true,
+			expPanic: false,
 		},
 		{
 			desc:     "tx signed with an incorrect key",
@@ -147,7 +151,9 @@ func TestBeforeTx(t *testing.T) {
 			chainID:  mockChainID,
 			accNum:   mockAccNum,
 			seq:      mockSeq,
+			maxGas:   types.DefaultMaxGas,
 			expOk:    false,
+			expPanic: false,
 		},
 		{
 			desc:     "tx signed with an incorrect chain id",
@@ -155,7 +161,9 @@ func TestBeforeTx(t *testing.T) {
 			chainID:  "wrong-chain-id",
 			accNum:   mockAccNum,
 			seq:      mockSeq,
+			maxGas:   types.DefaultMaxGas,
 			expOk:    false,
+			expPanic: false,
 		},
 		{
 			desc:     "tx signed with an incorrect account number",
@@ -163,7 +171,9 @@ func TestBeforeTx(t *testing.T) {
 			chainID:  mockChainID,
 			accNum:   4524455,
 			seq:      mockSeq,
+			maxGas:   types.DefaultMaxGas,
 			expOk:    false,
+			expPanic: false,
 		},
 		{
 			desc:     "tx signed with an incorrect sequence",
@@ -171,9 +181,27 @@ func TestBeforeTx(t *testing.T) {
 			chainID:  mockChainID,
 			accNum:   mockAccNum,
 			seq:      5786786,
+			maxGas:   types.DefaultMaxGas,
 			expOk:    false,
+			expPanic: false,
+		},
+		{
+			desc:     "contract call exceeds gas limit",
+			signWith: "test1",
+			chainID:  mockChainID,
+			accNum:   mockAccNum,
+			seq:      mockSeq,
+			maxGas:   1, // the call for sure will use more than 1 gas
+			expOk:    false,
+			expPanic: true, // attempting to consume above the gas limit results in panicking
 		},
 	} {
+		// set max gas
+		app.AbstractAccountKeeper.SetParams(ctx, &types.Params{
+			MaxGasBefore: tc.maxGas,
+			MaxGasAfter:  types.DefaultMaxGas,
+		})
+
 		msg := banktypes.NewMsgSend(absAcc.GetAddress(), acc2.GetAddress(), sdk.NewCoins())
 
 		tx, err := prepareTx2(
@@ -188,6 +216,15 @@ func TestBeforeTx(t *testing.T) {
 			tc.seq,
 		)
 		require.NoError(t, err)
+
+		if tc.expPanic {
+			require.Panics(t, func() {
+				decorator := makeBeforeTxDecorator(app)
+				decorator.AnteHandle(ctx, tx, false, anteTerminator)
+			})
+
+			return
+		}
 
 		decorator := makeBeforeTxDecorator(app)
 		_, err = decorator.AnteHandle(ctx, tx, false, anteTerminator)

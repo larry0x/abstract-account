@@ -12,6 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
+	"github.com/larry0x/abstract-account/simapp"
 	simapptesting "github.com/larry0x/abstract-account/simapp/testing"
 	"github.com/larry0x/abstract-account/x/abstractaccount/keeper"
 	"github.com/larry0x/abstract-account/x/abstractaccount/testdata"
@@ -27,6 +28,58 @@ var (
 	userInitialBalance = sdk.NewCoins(sdk.NewCoin(simapptesting.DefaultBondDenom, sdk.NewInt(123456)))
 	acctRegisterFunds  = sdk.NewCoins(sdk.NewCoin(simapptesting.DefaultBondDenom, sdk.NewInt(88888)))
 )
+
+func TestUpdateParams(t *testing.T) {
+	for _, tc := range []struct {
+		desc      string
+		sender    string
+		newParams *types.Params
+		expErr    bool
+	}{
+		{
+			desc:      "sender is not authority",
+			sender:    user.String(),
+			newParams: types.DefaultParams(),
+			expErr:    true,
+		},
+		{
+			desc:      "invalid params",
+			sender:    simapp.Authority,
+			newParams: &types.Params{MaxGasBefore: 88888, MaxGasAfter: 0},
+			expErr:    true,
+		},
+		{
+			desc:      "sender is authority and params are valid",
+			sender:    simapp.Authority,
+			newParams: &types.Params{MaxGasBefore: 88888, MaxGasAfter: 99999},
+			expErr:    false,
+		},
+	} {
+		app := simapptesting.MakeMockApp([]banktypes.Balance{})
+		ctx := app.NewContext(false, tmproto.Header{})
+
+		msgServer := keeper.NewMsgServerImpl(app.AbstractAccountKeeper)
+
+		paramsBefore, err1 := app.AbstractAccountKeeper.GetParams(ctx)
+		require.NoError(t, err1)
+
+		_, err2 := msgServer.UpdateParams(ctx, &types.MsgUpdateParams{
+			Sender: tc.sender,
+			Params: tc.newParams,
+		})
+
+		paramsAfter, err3 := app.AbstractAccountKeeper.GetParams(ctx)
+		require.NoError(t, err3)
+
+		if tc.expErr {
+			require.Error(t, err2)
+			require.Equal(t, paramsBefore, paramsAfter)
+		} else {
+			require.NoError(t, err2)
+			require.Equal(t, tc.newParams, paramsAfter)
+		}
+	}
+}
 
 func TestRegisterAccount(t *testing.T) {
 	app := simapptesting.MakeMockApp([]banktypes.Balance{
