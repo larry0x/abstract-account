@@ -25,7 +25,7 @@ Essentially, this means _to allow SCAs to initiate txs_. Authentication of txs, 
 
 The problem with Ethereum is that EVM is an established framework that has thousands of contracts already running on it, meaning core devs can't introduce big changes or they risk breaking many existing protocols. For Cosmos however, thanks to its [modular design][3], we're able to introduce AA without breaking anything. Let's see how this work in the next section.
 
-## How does this work
+## How this works
 
 ### The contract side
 
@@ -40,9 +40,7 @@ enum SudoMsg {
     tx_bytes:   Binary,
     credential: Binary,
   },
-  AfterTx {
-    success: bool,
-  },
+  AfterTx {},
 }
 ```
 
@@ -50,7 +48,7 @@ The state machine will call `before_tx` right before a tx is about to be execute
 
 - In `before_tx`, the SCA is provided with details of the tx and signing credentials. It can do signature verification here, and of course anything else it's programmed to do.
 
-- In `after_tx`, the SCA is informed of whether the tx has been successful or not. It can then take any action it's programmed to. For example, if the tx includes a trade on a DEX, it can check the slippage, and reject the tx (by throwing an error) if it's above a preset threshold.
+- The `after_tx` method is called only if both `before_tx` and ALL messages were executed successfully. Here it can then take any action it's programmed to. For example, if the tx includes a trade on a DEX, it can check the slippage, and reject the tx (by throwing an error) if it's above a preset threshold.
 
 To illustrate this in a graph:
 
@@ -155,6 +153,22 @@ For PostHandler, we append a new [`AfterTxDecorator`][8], where the SCA's `after
 
 That's it - AA isn't complicated, and we don't break any existing thing. To sum it up: *two new sudo methods on the contract side, two new Ante/PostHandler decorators on the state machine side*.
 
+## Parameters
+
+There are a few parameters you can use to customize the behavior of AbstractAccounts. They are updatable by the module's authority, typically set to the gov module account.
+
+- `allow_all_code_ids` and `allowed_code_ids`
+
+  Some chains may want to keep it permissioned which contracts can be instantiated as AbstractAccounts. They can do this by configuring these two parameters.
+
+- `max_gas_before` and `max_gas_after`
+
+  Some chains may also want to limit how much gas can be consumed by the Before/AfterTx hooks. The main consideration is DoS attacks - if a malicious account has an infinite loop in on of these hooks, large amount of CPU power will be used, but since the tx fails (it uses more gas than the block gas limit) the attacker doesn't need to pay any gas fee. To prevent this, set gas limits by configuring these two params.
+
+## How to use
+
+See the [simapp](./simapp/) for an example.
+
 ## Demo
 
 This repository contains three SCAs for demo purpose. Note, they are not considered ready for production use:
@@ -165,10 +179,6 @@ This repository contains three SCAs for demo purpose. Note, they are not conside
 | [`account-base`](./cosmwasm/contracts/base/)           | account controlled by a single secp256k1 pubkey              | n/a           |
 | [`account-granter`](./cosmwasm/contracts/granter/)     | account with authz grant capability                          | [YouTube][10] |
 | [`account-updatable`](./cosmwasm/contracts/updatable/) | account with rotatable pubkey                                | [YouTube][11] |
-
-Two of them ("updatable" and "granter") have accompanied video demos; see the table above for YouTube links.
-
-They are also used in unit tests of the module; see relevant test files for details.
 
 ## License
 
