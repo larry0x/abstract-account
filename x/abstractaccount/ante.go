@@ -160,9 +160,7 @@ func (d AfterTxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate, succe
 	d.aak.DeleteSignerAddress(ctx)
 
 	sudoMsgBytes, err := json.Marshal(&types.AccountSudoMsg{
-		AfterTx: &types.AfterTx{
-			Success: success,
-		},
+		AfterTx: &types.AfterTx{},
 	})
 	if err != nil {
 		return ctx, err

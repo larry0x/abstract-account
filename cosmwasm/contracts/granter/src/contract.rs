@@ -39,7 +39,6 @@ pub fn sudo(deps: DepsMut, env: Env, msg: AccountSudoMsg) -> ContractResult<Resp
             &credential,
         ),
         AccountSudoMsg::AfterTx {
-            ..
         } => base::execute::after_tx().map_err(Into::into),
     }
 }

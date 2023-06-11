@@ -18,9 +18,7 @@ type BeforeTx struct {
 	Credential []byte `json:"credential"`
 }
 
-type AfterTx struct {
-	Success bool `json:"success"`
-}
+type AfterTx struct{}
 
 func NewAnyFromProtoMsg(msg proto.Message) (*Any, error) {
 	msgBytes, err := proto.Marshal(msg)
