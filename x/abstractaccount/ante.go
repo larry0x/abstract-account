@@ -247,8 +247,11 @@ func sdkMsgsToAnys(msgs []sdk.Msg) ([]*types.Any, error) {
 }
 
 // Call a contract's sudo entry point with a gas limit.
+//
 // Copied from Osmosis' protorev posthandler:
 // https://github.com/osmosis-labs/osmosis/blob/98025f185ab2ee1b060511ed22679112abcc08fa/x/protorev/keeper/posthandler.go#L42-L43
+//
+// Thanks Roman and Jorge for the helpful discussion.
 func sudoWithGasLimit(
 	ctx sdk.Context, contractKeeper wasmtypes.ContractOpsKeeper,
 	contractAddr sdk.AccAddress, msg []byte, maxGas sdk.Gas,
