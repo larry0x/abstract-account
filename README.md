@@ -155,11 +155,7 @@ That's it - AA isn't complicated, and we don't break any existing thing. To sum 
 
 ## Parameters
 
-There are a few parameters you can use to customize the behavior of AbstractAccounts. They are updatable by the module's authority, typically set to the gov module account.
-
-- `allow_all_code_ids` and `allowed_code_ids`
-
-  Some chains may want to keep it permissioned which contracts can be instantiated as AbstractAccounts. They can do this by configuring these two parameters.
+Parameters are updatable by the module's authority, typically set to the gov module account.
 
 - `max_gas_before` and `max_gas_after`
 

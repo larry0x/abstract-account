@@ -9,11 +9,6 @@ import (
 )
 
 func (k Keeper) InitGenesis(ctx sdk.Context, gs *types.GenesisState) []abci.ValidatorUpdate {
-	// ensure that module account has been registered
-	if addr := k.ModuleAddress(); addr == nil {
-		panic("x/abstractaccount module account is not registered")
-	}
-
 	if err := k.SetParams(ctx, gs.Params); err != nil {
 		panic(err)
 	}

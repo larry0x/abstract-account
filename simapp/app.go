@@ -86,9 +86,8 @@ var (
 	)
 
 	maccPerms = map[string][]string{
-		abstractaccounttypes.ModuleName: nil,
-		authtypes.FeeCollectorName:      nil,
-		wasm.ModuleName:                 {authtypes.Burner},
+		authtypes.FeeCollectorName: nil,
+		wasm.ModuleName:            {authtypes.Burner},
 	}
 )
 

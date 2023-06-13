@@ -2,19 +2,17 @@ package types
 
 const DefaultMaxGas = 2_000_000
 
-func NewParams(allowAllCodeIDs bool, allowedCodeIds []uint64, maxGasBefore, maxGasAfter uint64) (*Params, error) {
+func NewParams(maxGasBefore, maxGasAfter uint64) (*Params, error) {
 	params := &Params{
-		AllowAllCodeIDs: allowAllCodeIDs,
-		AllowedCodeIDs:  allowedCodeIds,
-		MaxGasBefore:    maxGasBefore,
-		MaxGasAfter:     maxGasAfter,
+		MaxGasBefore: maxGasBefore,
+		MaxGasAfter:  maxGasAfter,
 	}
 
 	return params, params.Validate()
 }
 
 func DefaultParams() *Params {
-	params, _ := NewParams(true, []uint64{}, DefaultMaxGas, DefaultMaxGas)
+	params, _ := NewParams(DefaultMaxGas, DefaultMaxGas)
 
 	return params
 }
@@ -28,23 +26,5 @@ func (p *Params) Validate() error {
 		return ErrZeroMaxGas
 	}
 
-	if p.AllowAllCodeIDs && len(p.AllowedCodeIDs) > 0 {
-		return ErrInvalidAllowedCodeIDs
-	}
-
 	return nil
-}
-
-func (p *Params) IsAllowedCodeID(codeID uint64) bool {
-	if p.AllowAllCodeIDs {
-		return true
-	}
-
-	for _, allowedCodeID := range p.AllowedCodeIDs {
-		if codeID == allowedCodeID {
-			return true
-		}
-	}
-
-	return false
 }
