@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	_ sdk.Msg = &MsgRegisterAccount{}
 	_ sdk.Msg = &MsgUpdateParams{}
+	_ sdk.Msg = &MsgRegisterAccount{}
 )
 
 // ------------------------------- UpdateParams --------------------------------
