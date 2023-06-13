@@ -52,9 +52,3 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::Pubkey {} => to_binary(&query::pubkey(deps.storage)?),
     }
 }
-
-#[entry_point]
-pub fn migrate(_deps: DepsMut, _env: Env, _msg: Empty) -> StdResult<Response> {
-    // used in test only
-    Ok(Response::new())
-}
