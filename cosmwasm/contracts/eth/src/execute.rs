@@ -44,3 +44,49 @@ pub fn after_tx() -> ContractResult<Response> {
     Ok(Response::new()
         .add_attribute("method", "after_tx"))
 }
+
+// ----------------------------------- Test ------------------------------------
+
+#[cfg(test)]
+mod tests {
+    use cosmwasm_std::{testing::mock_dependencies, to_binary};
+
+    use super::*;
+
+    #[test]
+    fn verifying_ethereum_signature() {
+        let mut deps = mock_dependencies();
+
+        // examples taken from ethers-rs example:
+        // https://github.com/gakonst/ethers-rs/tree/master/ethers-signers#examples
+        let message = "hello world";
+        let address = "0x63F9725f107358c9115BC9d86c72dD5823E9B1E6";
+        let cred = Credential {
+            r: "49684349367057865656909429001867135922228948097036637749682965078859417767352".into(),
+            s: "26715700564957864553985478426289223220394026033170102795835907481710471636815".into(),
+            v: 28,
+        };
+
+        ETHEREUM_ADDRSS.save(deps.as_mut().storage, &address.into()).unwrap();
+
+        let res = before_tx(
+            deps.as_ref().storage,
+            &message.as_bytes().into(),
+            &to_binary(&cred).unwrap(),
+        );
+        assert!(res.is_ok());
+
+        // let's try an invalid case
+        // we simply change the address to a different one
+        let wrong_addrss = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045";
+
+        ETHEREUM_ADDRSS.save(deps.as_mut().storage, &wrong_addrss.into()).unwrap();
+
+        let res = before_tx(
+            deps.as_ref().storage,
+            &message.as_bytes().into(),
+            &to_binary(&cred).unwrap(),
+        );
+        assert!(res.is_err());
+    }
+}
