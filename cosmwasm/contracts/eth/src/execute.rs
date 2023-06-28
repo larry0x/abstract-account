@@ -1,4 +1,4 @@
-use cosmwasm_std::{from_binary, Binary, Response, Storage};
+use cosmwasm_std::{from_binary, Binary, Response, Storage, Deps};
 
 use crate::{crypto, error::ContractResult, state::ETHEREUM_ADDRESS};
 
@@ -11,18 +11,18 @@ pub fn init(store: &mut dyn Storage, address_str: &String) -> ContractResult<Res
 }
 
 pub fn before_tx(
-    store: &dyn Storage,
+    deps: Deps,
     tx_bytes: &Binary,
     cred_bytes: &Binary,
 ) -> ContractResult<Response> {
     // load the ethereum address
-    let address_str = ETHEREUM_ADDRESS.load(store)?;
+    let address_str = ETHEREUM_ADDRESS.load(deps.storage)?;
 
     // parse the ethereum signature
     let cred: crypto::Credential = from_binary(cred_bytes)?;
 
     // validate the ethereum signature
-    crypto::verify(tx_bytes.as_slice(), &address_str, &cred)?;
+    crypto::verify(deps.api, tx_bytes.as_slice(), &address_str, &cred)?;
 
     Ok(Response::new()
         .add_attribute("method", "before_tx"))

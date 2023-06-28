@@ -30,7 +30,7 @@ pub fn sudo(deps: DepsMut, _env: Env, msg: AccountSudoMsg) -> ContractResult<Res
             tx_bytes,
             credential,
             ..
-        } => execute::before_tx(deps.as_ref().storage, &tx_bytes, &credential),
+        } => execute::before_tx(deps.as_ref(), &tx_bytes, &credential),
         AccountSudoMsg::AfterTx {
         } => execute::after_tx(),
     }

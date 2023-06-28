@@ -26,9 +26,7 @@ cosmwasm-schema  = { workspace = true }
 cosmwasm-std     = { workspace = true }
 cw2              = { workspace = true }
 cw-storage-plus  = { workspace = true }
-generic-array    = { workspace = true }
 hex              = { workspace = true }
-k256             = { workspace = true }
 thiserror        = { workspace = true }
 tiny-keccak      = { workspace = true }
 
