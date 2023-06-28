@@ -26,6 +26,12 @@ cosmwasm-schema  = { workspace = true }
 cosmwasm-std     = { workspace = true }
 cw2              = { workspace = true }
 cw-storage-plus  = { workspace = true }
-ethers           = { workspace = true }
+ethers-core      = { workspace = true }
 rustc-hex        = { workspace = true }
 thiserror        = { workspace = true }
+
+# enables wasm compatibility for getrandom indirectly
+# https://docs.rs/getrandom/latest/getrandom/#webassembly-support
+# https://github.com/gakonst/ethers-rs/pull/2076
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2", features = ["js"] }

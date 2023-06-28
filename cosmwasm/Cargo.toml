@@ -20,7 +20,7 @@ cosmwasm-std     = { version = "1.2", features = ["stargate"] }
 cw2              = "1.0"
 cw-storage-plus  = "1"
 cw-utils         = "1"
-ethers           = { version = "2", default-features = false }
+ethers-core      = { version = "2", default-features = false }
 prost            = "0.11"
 rustc-hex        = "2"
 sha2             = "0.10"

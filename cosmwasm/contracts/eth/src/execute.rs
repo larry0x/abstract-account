@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use cosmwasm_std::{from_binary, Binary, Response, Storage};
-use ethers::types::{Address, Signature, U256};
+use ethers_core::types::{Address, Signature, U256};
 
 use crate::{error::ContractResult, msg::Credential, state::ETHEREUM_ADDRESS};
 
@@ -28,8 +28,8 @@ pub fn before_tx(
     // parse the ethereum signature
     let cred: Credential = from_binary(cred_bytes)?;
     let sig = Signature {
-        r: U256::from_dec_str(&cred.r)?,
-        s: U256::from_dec_str(&cred.s)?,
+        r: U256::from_dec_str(&cred.r).unwrap(),
+        s: U256::from_dec_str(&cred.s).unwrap(),
         v: cred.v,
     };
 
