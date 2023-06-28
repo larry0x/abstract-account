@@ -93,7 +93,7 @@ mod tests {
     fn verifying_ethereum_signature() {
         let api = MockApi::default();
 
-        // examples taken from ethers-rs example:
+        // example taken from ethers-rs:
         // https://github.com/gakonst/ethers-rs/tree/master/ethers-signers#examples
         let message = "hello world";
         let address = "0x63F9725f107358c9115BC9d86c72dD5823E9B1E6";
