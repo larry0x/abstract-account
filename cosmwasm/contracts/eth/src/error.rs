@@ -1,16 +1,16 @@
 #[derive(Debug, thiserror::Error)]
 pub enum ContractError {
-    // #[error(transparent)]
-    // FromDecStr(#[from] ethers::abi::ethereum_types::FromDecStrErr),
+    #[error(transparent)]
+    Ecdsa(#[from] k256::ecdsa::Error),
 
     #[error(transparent)]
-    FromHex(#[from] rustc_hex::FromHexError),
-
-    #[error(transparent)]
-    Signature(#[from] ethers_core::types::SignatureError),
+    FromHex(#[from] hex::FromHexError),
 
     #[error(transparent)]
     Std(#[from] cosmwasm_std::StdError),
+
+    #[error("invalid ethereum signature")]
+    InvalidSignature,
 }
 
 pub type ContractResult<T> = Result<T, ContractError>;

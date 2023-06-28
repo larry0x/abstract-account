@@ -26,9 +26,11 @@ cosmwasm-schema  = { workspace = true }
 cosmwasm-std     = { workspace = true }
 cw2              = { workspace = true }
 cw-storage-plus  = { workspace = true }
-ethers-core      = { workspace = true }
-rustc-hex        = { workspace = true }
+generic-array    = { workspace = true }
+hex              = { workspace = true }
+k256             = { workspace = true }
 thiserror        = { workspace = true }
+tiny-keccak      = { workspace = true }
 
 # enables wasm compatibility for getrandom indirectly
 # https://docs.rs/getrandom/latest/getrandom/#webassembly-support
