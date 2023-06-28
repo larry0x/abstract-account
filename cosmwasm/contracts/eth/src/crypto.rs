@@ -113,14 +113,14 @@ mod tests {
             v: 28,
         };
 
-        let res = verify(message.as_bytes(), &address, &cred);
+        let res = verify(message.as_bytes(), address, &cred);
         assert!(res.is_ok());
 
         // let's try an invalid case
         // we simply change the address to a different one
         let wrong_address = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045";
 
-        let res = verify(message.as_bytes(), &wrong_address, &cred);
+        let res = verify(message.as_bytes(), wrong_address, &cred);
         assert!(res.is_err());
     }
 }
