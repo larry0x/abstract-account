@@ -3,13 +3,13 @@ use std::str::FromStr;
 use cosmwasm_std::{from_binary, Binary, Response, Storage};
 use ethers::types::{Address, Signature, U256};
 
-use crate::{error::ContractResult, msg::Credential, state::ETHEREUM_ADDRSS};
+use crate::{error::ContractResult, msg::Credential, state::ETHEREUM_ADDRESS};
 
 pub fn init(store: &mut dyn Storage, address_str: &String) -> ContractResult<Response> {
     // validate ethereum address
     let _ = Address::from_str(address_str)?;
 
-    ETHEREUM_ADDRSS.save(store, address_str)?;
+    ETHEREUM_ADDRESS.save(store, address_str)?;
 
     Ok(Response::new()
         .add_attribute("method", "init")
@@ -22,7 +22,7 @@ pub fn before_tx(
     cred_bytes: &Binary,
 ) -> ContractResult<Response> {
     // load the ethereum address
-    let address_str = ETHEREUM_ADDRSS.load(store)?;
+    let address_str = ETHEREUM_ADDRESS.load(store)?;
     let address = Address::from_str(&address_str)?;
 
     // parse the ethereum signature
@@ -67,7 +67,7 @@ mod tests {
             v: 28,
         };
 
-        ETHEREUM_ADDRSS.save(deps.as_mut().storage, &address.into()).unwrap();
+        ETHEREUM_ADDRESS.save(deps.as_mut().storage, &address.into()).unwrap();
 
         let res = before_tx(
             deps.as_ref().storage,
@@ -80,7 +80,7 @@ mod tests {
         // we simply change the address to a different one
         let wrong_addrss = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045";
 
-        ETHEREUM_ADDRSS.save(deps.as_mut().storage, &wrong_addrss.into()).unwrap();
+        ETHEREUM_ADDRESS.save(deps.as_mut().storage, &wrong_addrss.into()).unwrap();
 
         let res = before_tx(
             deps.as_ref().storage,
