@@ -27,8 +27,3 @@ pub fn before_tx(
     Ok(Response::new()
         .add_attribute("method", "before_tx"))
 }
-
-pub fn after_tx() -> ContractResult<Response> {
-    Ok(Response::new()
-        .add_attribute("method", "after_tx"))
-}

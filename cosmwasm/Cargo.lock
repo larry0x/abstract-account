@@ -43,6 +43,7 @@ name = "account-eth"
 version = "0.0.0"
 dependencies = [
  "abstract-account",
+ "account-base",
  "cosmwasm-schema",
  "cosmwasm-std",
  "cw-storage-plus",

@@ -3,6 +3,7 @@ use cosmwasm_std::{
 };
 
 use abstract_account::AccountSudoMsg;
+use account_base as base;
 
 use crate::{
     error::ContractResult,
@@ -32,7 +33,7 @@ pub fn sudo(deps: DepsMut, _env: Env, msg: AccountSudoMsg) -> ContractResult<Res
             ..
         } => execute::before_tx(deps.as_ref(), &tx_bytes, &credential),
         AccountSudoMsg::AfterTx {
-        } => execute::after_tx(),
+        } => base::execute::after_tx().map_err(Into::into),
     }
 }
 

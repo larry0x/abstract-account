@@ -2,6 +2,9 @@
 #[derive(Debug, thiserror::Error)]
 pub enum ContractError {
     #[error(transparent)]
+    Base(#[from] account_base::error::ContractError),
+
+    #[error(transparent)]
     FromHex(#[from] hex::FromHexError),
 
     #[error(transparent)]
