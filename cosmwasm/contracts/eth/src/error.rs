@@ -13,6 +13,9 @@ pub enum ContractError {
     #[error(transparent)]
     RecoverPubkey(#[from] cosmwasm_std::RecoverPubkeyError),
 
+    #[error("recovery id can only be one of 0, 1, 27, 28")]
+    InvalidRecoveryId,
+
     #[error("recovered pubkey doesn't match with with signer address")]
     RecoveredPubkeyMismatch,
 }
