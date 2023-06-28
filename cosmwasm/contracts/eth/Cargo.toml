@@ -1,0 +1,32 @@
+[package]
+name          = "account-eth"
+description   = "A smart contract wallet that authenticates txs by verifying Ethereum signatures"
+version       = { workspace = true }
+rust-version  = { workspace = true }
+authors       = { workspace = true }
+edition       = { workspace = true }
+license       = { workspace = true }
+homepage      = { workspace = true }
+repository    = { workspace = true }
+documentation = { workspace = true }
+keywords      = { workspace = true }
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+# for more explicit tests, cargo test --features=backtraces
+backtraces = ["cosmwasm-std/backtraces"]
+# use library feature to disable all instantiate/execute/query exports
+library = []
+
+[dependencies]
+abstract-account = { path = "../../packages/abstract-account" }
+account-base     = { path = "../base", features = ["library"] }
+cosmwasm-schema  = { workspace = true }
+cosmwasm-std     = { workspace = true }
+cw2              = { workspace = true }
+cw-storage-plus  = { workspace = true }
+hex              = { workspace = true }
+thiserror        = { workspace = true }
+tiny-keccak      = { workspace = true }

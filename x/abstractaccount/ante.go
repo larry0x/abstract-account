@@ -52,19 +52,6 @@ func NewBeforeTxDecorator(aak keeper.Keeper, ak authante.AccountKeeper, signMode
 }
 
 func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	// we don't support simulation yet. we need to make some desing choices on how
-	// to implement simulation. we can either:
-	//
-	// - skip the contract call part. this makes simulation inaccurate
-	// - have the contract implement two more methods, SudoMsg::{BeforeTxSim,AfterTxSim}
-	//   but this increases the burden on developers
-	//
-	// return an explicit error message so that the user is informed of what's
-	// going on
-	if simulate {
-		return ctx, sdkerrors.ErrNotSupported.Wrap("Simulation of AbstractAccount txs isn't supported yet. We're still in discussion on what's the best approach to implement simulation. Please chat with us on GitHub or elsewhere!")
-	}
-
 	// first we need to determine whether the rules of account abstraction should
 	// apply to this tx. there are two criteria:
 	//
@@ -82,6 +69,19 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 	if !isAbstractAccountTx {
 		svd := authante.NewSigVerificationDecorator(d.ak, d.signModeHandler)
 		return svd.AnteHandle(ctx, tx, simulate, next)
+	}
+
+	// we don't support simulation yet. we need to make some desing choices on how
+	// to implement simulation. we can either:
+	//
+	// - skip the contract call part. this makes simulation inaccurate
+	// - have the contract implement two more methods, SudoMsg::{BeforeTxSim,AfterTxSim}
+	//   but this increases the burden on developers
+	//
+	// return an explicit error message so that the user is informed of what's
+	// going on
+	if simulate {
+		return ctx, sdkerrors.ErrNotSupported.Wrap("Simulation of AbstractAccount txs isn't supported yet. We're still in discussion on what's the best approach to implement simulation. Please chat with us on GitHub or elsewhere!")
 	}
 
 	// save the account address to the module store. we will need it in the

@@ -173,8 +173,9 @@ This repository contains three SCAs for demo purpose. Note, they are not conside
 | ------------------------------------------------------ | ------------------------------------------------------------ | ------------- |
 | [`account-asym-totp`](./cosmwasm/contracts/asym-totp/) | account that uses an asymmetric time-based one-time password | [YouTube][9]  |
 | [`account-base`](./cosmwasm/contracts/base/)           | account controlled by a single secp256k1 pubkey              | n/a           |
-| [`account-granter`](./cosmwasm/contracts/granter/)     | account with authz grant capability                          | [YouTube][10] |
-| [`account-updatable`](./cosmwasm/contracts/updatable/) | account with rotatable pubkey                                | [YouTube][11] |
+| [`account-eth`](./cosmwasm//contracts//eth/)           | account controlled by Ethereum signatures                    | [YouTube][10] |
+| [`account-granter`](./cosmwasm/contracts/granter/)     | account with authz grant capability                          | [YouTube][11] |
+| [`account-updatable`](./cosmwasm/contracts/updatable/) | account with rotatable pubkey                                | [YouTube][12] |
 
 ## License
 
@@ -189,5 +190,6 @@ This repository contains three SCAs for demo purpose. Note, they are not conside
 [7]: https://github.com/larry0x/abstract-account/blob/main/x/abstractaccount/ante.go#L46-L128
 [8]: https://github.com/larry0x/abstract-account/blob/main/x/abstractaccount/ante.go#L132-L173
 [9]: https://youtu.be/XhszRNCVrpg
-[10]: https://youtu.be/ofB53JgsWg0
-[11]: https://youtu.be/AdaLn28qG70
+[10]: https://youtu.be/vI2baN2jTKY
+[11]: https://youtu.be/ofB53JgsWg0
+[12]: https://youtu.be/AdaLn28qG70

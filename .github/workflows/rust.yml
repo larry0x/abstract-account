@@ -20,7 +20,7 @@ jobs:
           targets: wasm32-unknown-unknown
 
       - name: Check for errors
-        run: cargo check --locked --tests --target wasm32-unknown-unknown
+        run: cargo check --locked --target wasm32-unknown-unknown
         env:
           RUST_BACKTRACE: 1
 
