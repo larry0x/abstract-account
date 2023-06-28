@@ -37,7 +37,7 @@ pub fn verify(
     let recoverable_sig = &sig_bytes[..64];
     let recovery_id = normalize_recovery_id(sig_bytes[64])?;
 
-    let pk_bytes = api.secp256k1_recover_pubkey(&msg_hash_bytes, &recoverable_sig, recovery_id)?;
+    let pk_bytes = api.secp256k1_recover_pubkey(&msg_hash_bytes, recoverable_sig, recovery_id)?;
 
     let hash = keccak256(&pk_bytes[1..]);
     let recovered_addr = &hash[12..];

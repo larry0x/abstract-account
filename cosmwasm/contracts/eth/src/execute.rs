@@ -20,7 +20,7 @@ pub fn before_tx(
     let addr_bytes = hex::decode(&addr_str[2..])?;
 
     // validate the ethereum signature
-    crypto::verify(deps.api, &tx_bytes, &sig_bytes, &addr_bytes)?;
+    crypto::verify(deps.api, tx_bytes, sig_bytes, &addr_bytes)?;
 
     Ok(Response::new()
         .add_attribute("method", "before_tx"))
