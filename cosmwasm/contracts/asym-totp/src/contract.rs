@@ -1,4 +1,4 @@
-use abstract_account::AccountSudoMsg;
+use absacc::AccountSudoMsg;
 use account_base as base;
 use cosmwasm_std::{
     entry_point, to_binary, Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult,

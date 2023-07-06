@@ -3,7 +3,7 @@
 version = 3
 
 [[package]]
-name = "abstract-account"
+name = "absacc"
 version = "0.0.0"
 dependencies = [
  "cosmos-sdk-proto",
@@ -16,7 +16,7 @@ dependencies = [
 name = "account-asym-totp"
 version = "0.0.0"
 dependencies = [
- "abstract-account",
+ "absacc",
  "account-base",
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -29,7 +29,7 @@ dependencies = [
 name = "account-base"
 version = "0.0.0"
 dependencies = [
- "abstract-account",
+ "absacc",
  "cosmwasm-schema",
  "cosmwasm-std",
  "cw-storage-plus",
@@ -42,7 +42,7 @@ dependencies = [
 name = "account-eth"
 version = "0.0.0"
 dependencies = [
- "abstract-account",
+ "absacc",
  "account-base",
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -57,7 +57,7 @@ dependencies = [
 name = "account-granter"
 version = "0.0.0"
 dependencies = [
- "abstract-account",
+ "absacc",
  "account-base",
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -71,7 +71,7 @@ dependencies = [
 name = "account-updatable"
 version = "0.0.0"
 dependencies = [
- "abstract-account",
+ "absacc",
  "account-base",
  "cosmwasm-schema",
  "cosmwasm-std",

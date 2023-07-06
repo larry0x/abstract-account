@@ -21,7 +21,7 @@ backtraces = ["cosmwasm-std/backtraces"]
 library = []
 
 [dependencies]
-abstract-account = { path = "../../packages/abstract-account" }
+absacc           = { path = "../../packages/absacc" }
 cosmwasm-schema  = { workspace = true }
 cosmwasm-std     = { workspace = true }
 cw2              = { workspace = true }
