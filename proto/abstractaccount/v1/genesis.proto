@@ -1,5 +1,5 @@
 syntax = "proto3";
-package larry.abstractaccount.v1;
+package abstractaccount.v1;
 
 import "abstractaccount/v1/params.proto";
 
