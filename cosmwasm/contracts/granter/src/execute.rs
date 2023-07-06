@@ -1,7 +1,7 @@
 use cosmwasm_std::{Binary, Deps, Response, Storage, DepsMut, Env, MessageInfo, BlockInfo, from_binary};
 use cw_utils::Expiration;
 
-use abstract_account::Any;
+use absacc::Any;
 use account_base::{
     error::ContractError as BaseError,
     execute::{assert_self, sha256},

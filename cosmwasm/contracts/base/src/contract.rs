@@ -2,7 +2,7 @@ use cosmwasm_std::{
     entry_point, to_binary, Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult,
 };
 
-use abstract_account::AccountSudoMsg;
+use absacc::AccountSudoMsg;
 
 use crate::{
     error::ContractResult,
