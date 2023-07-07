@@ -1,18 +1,31 @@
 syntax = "proto3";
 package abstractaccount.v1;
 
+import "gogoproto/gogo.proto";
+
 option go_package = "github.com/larry0x/abstract-account/x/abstractaccount/types";
 
 message Params {
+  // AllowAllCodeIDs determines whether a Wasm code ID can be used to register
+  // AbstractAccounts:
+  // - if set to true, any code ID can be used;
+  // - if set to false, only code IDs whitelisted in the AllowedCodeIDs list can
+  // be used.
+  bool allow_all_code_ids = 1 [(gogoproto.customname) = "AllowAllCodeIDs"];
+
+  // AllowedCodeIDs is the whitelist of Wasm code IDs that can be used to
+  // regiseter AbstractAccounts.
+  repeated uint64 allowed_code_ids = 2 [(gogoproto.customname) = "AllowedCodeIDs"];
+
   // MaxGasBefore is the maximum amount of gas that can be consumed by the
   // contract call in the before_tx decorator.
   //
   // Must be greater than zero.
-  uint64 max_gas_before = 1;
+  uint64 max_gas_before = 3;
 
   // MaxGasAfter is the maximum amount of gas that can be consumed by the
   // contract call in the after_tx decorator.
   //
   // Must be greater than zero.
-  uint64 max_gas_after = 2;
+  uint64 max_gas_after = 4;
 }

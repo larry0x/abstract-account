@@ -39,3 +39,37 @@ func TestValidateParams(t *testing.T) {
 		}
 	}
 }
+
+func TestDeterminedAllowedCodeID(t *testing.T) {
+	for _, tc := range []struct {
+		allowAllCodeIDs bool
+		allowedCodeIDs  []uint64
+		codeID          uint64
+		expAllowed      bool
+	}{
+		{
+			allowAllCodeIDs: true,
+			allowedCodeIDs:  []uint64{},
+			codeID:          69420,
+			expAllowed:      true,
+		},
+		{
+			allowAllCodeIDs: false,
+			allowedCodeIDs:  []uint64{12345, 42069, 69420},
+			codeID:          69420,
+			expAllowed:      true,
+		},
+		{
+			allowAllCodeIDs: false,
+			allowedCodeIDs:  []uint64{12345, 42069, 69420},
+			codeID:          88888,
+			expAllowed:      false,
+		},
+	} {
+		params, err := types.NewParams(tc.allowAllCodeIDs, tc.allowedCodeIDs, types.DefaultMaxGas, types.DefaultMaxGas)
+		require.NoError(t, err)
+
+		allowed := params.IsAllowed(tc.codeID)
+		require.Equal(t, tc.expAllowed, allowed)
+	}
+}

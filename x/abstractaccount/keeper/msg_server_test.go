@@ -88,48 +88,78 @@ func TestUpdateParams(t *testing.T) {
 // ------------------------------ RegisterAccount ------------------------------
 
 func TestRegisterAccount(t *testing.T) {
-	app := simapptesting.MakeMockApp([]banktypes.Balance{
+	for _, tc := range []struct {
+		allowAllCodeIDs bool
+		allowedCodeIDs  []uint64
+		expOk           bool
+	}{
 		{
-			Address: user.String(),
-			Coins:   userInitialBalance,
+			allowAllCodeIDs: true,
+			allowedCodeIDs:  []uint64{},
+			expOk:           true,
 		},
-	})
+		{
+			allowAllCodeIDs: false,
+			allowedCodeIDs:  []uint64{1, 69, 420},
+			expOk:           true,
+		},
+		{
+			allowAllCodeIDs: false,
+			allowedCodeIDs:  []uint64{69, 420},
+			expOk:           false,
+		},
+	} {
+		app := simapptesting.MakeMockApp([]banktypes.Balance{
+			{
+				Address: user.String(),
+				Coins:   userInitialBalance,
+			},
+		})
 
-	ctx := app.NewContext(false, tmproto.Header{
-		// whenever we execute a contract, we must specify the block time in the
-		// header, so that wasmkeeper knows what to use for env.block.time
-		//
-		// if not doing this, will get this error:
-		// panic: Block (unix) time must never be empty or negative
-		Time: time.Now(),
-	})
+		ctx := app.NewContext(false, tmproto.Header{
+			// whenever we execute a contract, we must specify the block time in the
+			// header, so that wasmkeeper knows what to use for env.block.time
+			//
+			// if not doing this, will get this error:
+			// panic: Block (unix) time must never be empty or negative
+			Time: time.Now(),
+		})
 
-	k := app.AbstractAccountKeeper
+		params, err := types.NewParams(tc.allowAllCodeIDs, tc.allowedCodeIDs, types.DefaultMaxGas, types.DefaultMaxGas)
+		require.NoError(t, err)
 
-	// store code
-	codeID, err := storeCode(ctx, k.ContractKeeper())
-	require.NoError(t, err)
-	require.Equal(t, uint64(1), codeID)
+		k := app.AbstractAccountKeeper
+		k.SetParams(ctx, params)
 
-	// register account
-	accAddr, err := registerAccount(ctx, keeper.NewMsgServerImpl(k), codeID)
-	require.NoError(t, err)
+		// store code
+		codeID, err := storeCode(ctx, k.ContractKeeper())
+		require.NoError(t, err)
+		require.Equal(t, uint64(1), codeID)
 
-	// check the contract info is correct
-	contractInfo := app.WasmKeeper.GetContractInfo(ctx, accAddr)
-	require.Equal(t, codeID, contractInfo.CodeID)
-	require.Equal(t, user.String(), contractInfo.Creator)
-	require.Equal(t, accAddr.String(), contractInfo.Admin)
-	require.Equal(t, fmt.Sprintf("%s/%d", types.ModuleName, k.GetNextAccountID(ctx)-1), contractInfo.Label)
+		// register account
+		accAddr, err := registerAccount(ctx, keeper.NewMsgServerImpl(k), codeID)
 
-	// make sure an AbstractAccount has been created
-	_, ok := app.AccountKeeper.GetAccount(ctx, accAddr).(*types.AbstractAccount)
-	require.True(t, ok)
+		if tc.expOk {
+			require.NoError(t, err)
 
-	// make sure the contract has received the funds
-	balance := app.BankKeeper.GetAllBalances(ctx, accAddr)
-	require.Equal(t, acctRegisterFunds, balance)
+			// check the contract info is correct
+			contractInfo := app.WasmKeeper.GetContractInfo(ctx, accAddr)
+			require.Equal(t, codeID, contractInfo.CodeID)
+			require.Equal(t, user.String(), contractInfo.Creator)
+			require.Equal(t, accAddr.String(), contractInfo.Admin)
+			require.Equal(t, fmt.Sprintf("%s/%d", types.ModuleName, k.GetNextAccountID(ctx)-1), contractInfo.Label)
 
+			// make sure an AbstractAccount has been created
+			_, ok := app.AccountKeeper.GetAccount(ctx, accAddr).(*types.AbstractAccount)
+			require.True(t, ok)
+
+			// make sure the contract has received the funds
+			balance := app.BankKeeper.GetAllBalances(ctx, accAddr)
+			require.Equal(t, acctRegisterFunds, balance)
+		} else {
+			require.Error(t, err)
+		}
+	}
 }
 
 // ---------------------------------- Helpers ----------------------------------
