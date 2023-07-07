@@ -2,17 +2,19 @@ package types
 
 const DefaultMaxGas = 2_000_000
 
-func NewParams(maxGasBefore, maxGasAfter uint64) (*Params, error) {
+func NewParams(allowAllCodeIDs bool, allowedCodeIDs []uint64, maxGasBefore, maxGasAfter uint64) (*Params, error) {
 	params := &Params{
-		MaxGasBefore: maxGasBefore,
-		MaxGasAfter:  maxGasAfter,
+		AllowAllCodeIDs: allowAllCodeIDs,
+		AllowedCodeIDs:  allowedCodeIDs,
+		MaxGasBefore:    maxGasBefore,
+		MaxGasAfter:     maxGasAfter,
 	}
 
 	return params, params.Validate()
 }
 
 func DefaultParams() *Params {
-	params, _ := NewParams(DefaultMaxGas, DefaultMaxGas)
+	params, _ := NewParams(true, []uint64{}, DefaultMaxGas, DefaultMaxGas)
 
 	return params
 }
@@ -27,4 +29,20 @@ func (p *Params) Validate() error {
 	}
 
 	return nil
+}
+
+// IsAllowed returns whether a code ID is allowed to be used to register
+// AbstractAccounts.
+func (p *Params) IsAllowed(codeID uint64) bool {
+	if p.AllowAllCodeIDs {
+		return true
+	}
+
+	for _, allowedCodeID := range p.AllowedCodeIDs {
+		if codeID == allowedCodeID {
+			return true
+		}
+	}
+
+	return false
 }

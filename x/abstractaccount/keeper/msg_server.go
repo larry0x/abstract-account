@@ -45,6 +45,15 @@ func (ms msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdatePara
 func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegisterAccount) (*types.MsgRegisterAccountResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	params, err := ms.k.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if !params.IsAllowed(req.CodeID) {
+		return nil, types.ErrNotAllowedCodeID
+	}
+
 	senderAddr, err := sdk.AccAddressFromBech32(req.Sender)
 	if err != nil {
 		return nil, err
