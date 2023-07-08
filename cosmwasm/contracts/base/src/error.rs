@@ -9,6 +9,9 @@ pub enum ContractError {
     #[error("signature is invalid")]
     InvalidSignature,
 
+    #[error("signature not found")]
+    SignatureNotFound,
+
     #[error("only the contract itself can call this method")]
     Unauthorized,
 }

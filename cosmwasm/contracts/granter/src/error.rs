@@ -9,6 +9,9 @@ pub enum ContractError {
     #[error(transparent)]
     Verification(#[from] cosmwasm_std::VerificationError),
 
+    #[error("credential is not provided")]
+    CredentialNotFound,
+
     #[error("grant found for grantee `{grantee}` and type_url `{type_url}`")]
     GrantExpired {
         type_url: String,
