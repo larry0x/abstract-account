@@ -1,5 +1,6 @@
 // there isn't anything to test for in module.go
-// instead this file contains helper functions to be used for testing ante.go
+// instead this file contains helper functions to be used for testing other
+// files in this module
 
 package abstractaccount_test
 
