@@ -37,29 +37,46 @@ func TestIsAbstractAccountTx(t *testing.T) {
 	require.NoError(t, err)
 
 	acc2, err := makeMockAccount(keybase, "test2")
+	acc2 = types.NewAbstractAccountFromAccount(acc2)
 	require.NoError(t, err)
 
 	app.AccountKeeper.SetAccount(ctx, acc1)
-	app.AccountKeeper.SetAccount(ctx, types.NewAbstractAccountFromAccount(acc2))
+	app.AccountKeeper.SetAccount(ctx, acc2)
+
+	signer1 := Signer{
+		keyName:        "test1",
+		acc:            acc1,
+		overrideAccNum: nil,
+		overrideSeq:    nil,
+	}
+	signer2 := Signer{
+		keyName:        "test2",
+		acc:            acc2,
+		overrideAccNum: nil,
+		overrideSeq:    nil,
+	}
 
 	for _, tc := range []struct {
-		desc  string
-		msgs  []sdk.Msg
-		expIs bool
+		desc    string
+		msgs    []sdk.Msg
+		signers []Signer
+		expIs   bool
 	}{
 		{
 			desc: "tx has one signer and it is an AbstractAccount",
 			msgs: []sdk.Msg{
 				banktypes.NewMsgSend(acc2.GetAddress(), acc1.GetAddress(), sdk.NewCoins()),
 			},
-			expIs: true,
+			signers: []Signer{signer2},
+			expIs:   true,
 		},
 		{
 			desc: "tx has one signer but it's not an AbstractAccount",
 			msgs: []sdk.Msg{
 				banktypes.NewMsgSend(acc1.GetAddress(), acc2.GetAddress(), sdk.NewCoins()),
 			},
-			expIs: false,
+			signers: []Signer{signer1},
+			expIs:   false,
 		},
 		{
 			desc: "tx has more than one signers",
@@ -67,10 +84,11 @@ func TestIsAbstractAccountTx(t *testing.T) {
 				banktypes.NewMsgSend(acc1.GetAddress(), acc2.GetAddress(), sdk.NewCoins()),
 				banktypes.NewMsgSend(acc2.GetAddress(), acc1.GetAddress(), sdk.NewCoins()),
 			},
-			expIs: false,
+			signers: []Signer{signer1, signer2},
+			expIs:   false,
 		},
 	} {
-		sigTx, err := prepareTx(ctx, app, tc.msgs)
+		sigTx, err := prepareTx(ctx, app, keybase, tc.msgs, tc.signers, mockChainID, true)
 		require.NoError(t, err)
 
 		is, _, _, err := abstractaccount.IsAbstractAccountTx(ctx, sigTx, app.AccountKeeper)
@@ -254,17 +272,21 @@ func TestBeforeTx(t *testing.T) {
 
 		msg := banktypes.NewMsgSend(absAcc.GetAddress(), acc2.GetAddress(), sdk.NewCoins())
 
-		tx, err := prepareTx2(
+		signer := Signer{
+			keyName:        tc.signWith,
+			acc:            absAcc,
+			overrideAccNum: &tc.accNum,
+			overrideSeq:    &tc.seq,
+		}
+
+		tx, err := prepareTx(
 			ctx,
 			app,
-			[]sdk.Msg{msg},
 			keybase,
-			tc.signWith,
-			tc.sign,
-			absAcc,
+			[]sdk.Msg{msg},
+			[]Signer{signer},
 			tc.chainID,
-			tc.accNum,
-			tc.seq,
+			tc.sign,
 		)
 		require.NoError(t, err)
 
@@ -325,17 +347,17 @@ func TestAfterTx(t *testing.T) {
 	// save the signer address to mimic what happens in the BeforeTx hook
 	app.AbstractAccountKeeper.SetSignerAddress(ctx, absAcc.GetAddress())
 
-	tx, err := prepareTx2(
+	tx, err := prepareTx(
 		ctx,
 		app,
-		[]sdk.Msg{banktypes.NewMsgSend(absAcc.GetAddress(), acc.GetAddress(), sdk.NewCoins())},
 		keybase,
-		"test1",
-		true,
-		absAcc,
+		[]sdk.Msg{banktypes.NewMsgSend(absAcc.GetAddress(), acc.GetAddress(), sdk.NewCoins())},
+		[]Signer{{
+			keyName: "test1",
+			acc:     absAcc,
+		}},
 		mockChainID,
-		absAcc.GetAccountNumber(),
-		absAcc.GetSequence(),
+		true,
 	)
 	require.NoError(t, err)
 
