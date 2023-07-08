@@ -19,12 +19,14 @@ pub fn before_tx(
     block: &BlockInfo,
     msgs: &[Any],
     tx_bytes: &Binary,
-    credential_bytes: &Binary,
+    credential_bytes: Option<&Binary>,
+    simulate: bool,
 ) -> ContractResult<Response> {
     let tx_bytes_hash = sha256(tx_bytes);
     let pubkey = PUBKEY.load(deps.storage)?;
 
-    let credential: Credential = from_binary(credential_bytes)?;
+    let cred_bytes = credential_bytes.ok_or(ContractError::CredentialNotFound)?;
+    let credential: Credential = from_binary(cred_bytes)?;
 
     // if the signature is signed by the account's own pubkey, the simply move
     // on to verify the signature
@@ -36,8 +38,15 @@ pub fn before_tx(
         assert_has_grant(deps.storage, block, msgs, &credential.pubkey)?;
     }
 
-    if !deps.api.secp256k1_verify(&tx_bytes_hash, &credential.signature, &credential.pubkey)? {
-        return Err(BaseError::InvalidSignature.into());
+    // skip sig verificatio in simulation mode
+    if !simulate {
+        let Some(sig_bytes) = &credential.signature else {
+            return Err(BaseError::SignatureNotFound.into());
+        };
+
+        if !deps.api.secp256k1_verify(&tx_bytes_hash, sig_bytes, &credential.pubkey)? {
+            return Err(BaseError::InvalidSignature.into());
+        }
     }
 
     Ok(Response::new()

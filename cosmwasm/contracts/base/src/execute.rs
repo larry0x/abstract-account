@@ -17,13 +17,21 @@ pub fn init(store: &mut dyn Storage, pubkey: &Binary) -> ContractResult<Response
 pub fn before_tx(
     deps: Deps,
     tx_bytes: &Binary,
-    signature: &Binary,
+    signature: Option<&Binary>,
+    simulate: bool,
 ) -> ContractResult<Response> {
     let tx_bytes_hash = sha256(tx_bytes);
     let pubkey = PUBKEY.load(deps.storage)?;
 
-    if !deps.api.secp256k1_verify(&tx_bytes_hash, signature, &pubkey)? {
-        return Err(ContractError::InvalidSignature);
+    // skip the signature validation in simulation mode
+    if !simulate {
+        let Some(sig_bytes) = signature else {
+            return Err(ContractError::SignatureNotFound);
+        };
+
+        if !deps.api.secp256k1_verify(&tx_bytes_hash, sig_bytes, &pubkey)? {
+            return Err(ContractError::InvalidSignature);
+        }
     }
 
     Ok(Response::new()

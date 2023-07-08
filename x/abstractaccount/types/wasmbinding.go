@@ -15,10 +15,13 @@ type AccountSudoMsg struct {
 type BeforeTx struct {
 	Msgs       []*Any `json:"msgs"`
 	TxBytes    []byte `json:"tx_bytes"`
-	Credential []byte `json:"credential"`
+	Credential []byte `json:"credential,omitempty"`
+	Simulate   bool   `json:"simulate"`
 }
 
-type AfterTx struct{}
+type AfterTx struct {
+	Simulate bool `json:"simulate"`
+}
 
 func NewAnyFromProtoMsg(msg proto.Message) (*Any, error) {
 	msgBytes, err := proto.Marshal(msg)

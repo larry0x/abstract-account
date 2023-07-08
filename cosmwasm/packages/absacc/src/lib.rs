@@ -29,9 +29,15 @@ pub enum AccountSudoMsg {
         /// This is taken from the tx's "signature" field, but in the case of
         /// AbstractAccounts, this is not necessarily a cryptographic signature.
         /// The contract is free to interpret this as any data type.
-        credential: Binary,
+        credential: Option<Binary>,
+
+        /// Whether the tx is being run in the simulation mode.
+        simulate: bool,
     },
 
     /// Called by the PostHandler's AfterTxDecorator after the tx is executed.
-    AfterTx {},
+    AfterTx {
+        /// Whether the tx is being run in the simulation mode.
+        simulate: bool,
+    },
 }

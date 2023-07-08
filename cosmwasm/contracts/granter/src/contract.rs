@@ -31,14 +31,17 @@ pub fn sudo(deps: DepsMut, env: Env, msg: AccountSudoMsg) -> ContractResult<Resp
             msgs,
             tx_bytes,
             credential,
+            simulate,
         } => execute::before_tx(
             deps.as_ref(),
             &env.block,
             &msgs,
             &tx_bytes,
-            &credential,
+            credential.as_ref(),
+            simulate,
         ),
         AccountSudoMsg::AfterTx {
+            ..
         } => base::execute::after_tx().map_err(Into::into),
     }
 }

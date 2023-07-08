@@ -10,7 +10,8 @@ pub struct Grant {
 #[cw_serde]
 pub struct Credential {
     pub pubkey:    Binary,
-    pub signature: Binary,
+    /// Not needed in simulation mode
+    pub signature: Option<Binary>,
 }
 
 #[cw_serde]
@@ -18,7 +19,7 @@ pub enum ExecuteMsg {
     /// Grant another pubkey the ability to sign messages on this account's
     /// behalf.
     ///
-    /// Only callable by the account itself.
+    /// Only callable by the accsount itself.
     Grant {
         type_url: String,
         grantee:  Binary,
