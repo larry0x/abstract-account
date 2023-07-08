@@ -35,15 +35,15 @@ In order to achieve this, the SCA must implement [two sudo methods][4], `before_
 
 ```rust
 enum SudoMsg {
-  BeforeTx {
-    msgs:       Vec<Any>,
-    tx_bytes:   Binary,
-    cred_bytes: Option<Binary>,
-    simulate:   bool,
-  },
-  AfterTx {
-    simulate: bool,
-  },
+    BeforeTx {
+        msgs:       Vec<Any>,
+        tx_bytes:   Binary,
+        cred_bytes: Option<Binary>,
+        simulate:   bool,
+    },
+    AfterTx {
+        simulate: bool,
+    },
 }
 ```
 
