@@ -127,7 +127,9 @@ func TestBeforeTx(t *testing.T) {
 
 	for _, tc := range []struct {
 		desc     string
-		signWith string
+		simulate bool   // whether to run the AnteHandler in simulation mode
+		sign     bool   // whether a signature is to be included with this tx
+		signWith string // if a sig is to be included, which key to use to sign it
 		chainID  string
 		accNum   uint64
 		seq      uint64
@@ -137,6 +139,8 @@ func TestBeforeTx(t *testing.T) {
 	}{
 		{
 			desc:     "tx signed with the correct key",
+			simulate: false,
+			sign:     true,
 			signWith: "test1",
 			chainID:  mockChainID,
 			accNum:   mockAccNum,
@@ -147,6 +151,8 @@ func TestBeforeTx(t *testing.T) {
 		},
 		{
 			desc:     "tx signed with an incorrect key",
+			simulate: false,
+			sign:     true,
 			signWith: "test2",
 			chainID:  mockChainID,
 			accNum:   mockAccNum,
@@ -157,6 +163,8 @@ func TestBeforeTx(t *testing.T) {
 		},
 		{
 			desc:     "tx signed with an incorrect chain id",
+			simulate: false,
+			sign:     true,
 			signWith: "test1",
 			chainID:  "wrong-chain-id",
 			accNum:   mockAccNum,
@@ -167,6 +175,8 @@ func TestBeforeTx(t *testing.T) {
 		},
 		{
 			desc:     "tx signed with an incorrect account number",
+			simulate: false,
+			sign:     true,
 			signWith: "test1",
 			chainID:  mockChainID,
 			accNum:   4524455,
@@ -177,6 +187,8 @@ func TestBeforeTx(t *testing.T) {
 		},
 		{
 			desc:     "tx signed with an incorrect sequence",
+			simulate: false,
+			sign:     true,
 			signWith: "test1",
 			chainID:  mockChainID,
 			accNum:   mockAccNum,
@@ -187,6 +199,8 @@ func TestBeforeTx(t *testing.T) {
 		},
 		{
 			desc:     "contract call exceeds gas limit",
+			simulate: false,
+			sign:     true,
 			signWith: "test1",
 			chainID:  mockChainID,
 			accNum:   mockAccNum,
@@ -194,6 +208,42 @@ func TestBeforeTx(t *testing.T) {
 			maxGas:   1, // the call for sure will use more than 1 gas
 			expOk:    false,
 			expPanic: true, // attempting to consume above the gas limit results in panicking
+		},
+		{
+			desc:     "not in simulation mode, but tx isn't signed",
+			simulate: false,
+			sign:     false,
+			signWith: "",
+			chainID:  mockChainID,
+			accNum:   mockAccNum,
+			seq:      mockSeq,
+			maxGas:   types.DefaultMaxGas,
+			expOk:    false,
+			expPanic: false,
+		},
+		{
+			desc:     "in simulation, tx is signed",
+			simulate: true,
+			sign:     true,
+			signWith: "test1",
+			chainID:  mockChainID,
+			accNum:   mockAccNum,
+			seq:      mockSeq,
+			maxGas:   types.DefaultMaxGas,
+			expOk:    true, // we accept it
+			expPanic: false,
+		},
+		{
+			desc:     "in simulation, tx is not signed",
+			simulate: true,
+			sign:     false,
+			signWith: "test1",
+			chainID:  mockChainID,
+			accNum:   mockAccNum,
+			seq:      mockSeq,
+			maxGas:   types.DefaultMaxGas,
+			expOk:    true, // in simulation mode, for this particular account type, the credential can be omitted
+			expPanic: false,
 		},
 	} {
 		// set max gas
@@ -210,6 +260,7 @@ func TestBeforeTx(t *testing.T) {
 			[]sdk.Msg{msg},
 			keybase,
 			tc.signWith,
+			tc.sign,
 			absAcc,
 			tc.chainID,
 			tc.accNum,
@@ -220,14 +271,14 @@ func TestBeforeTx(t *testing.T) {
 		if tc.expPanic {
 			require.Panics(t, func() {
 				decorator := makeBeforeTxDecorator(app)
-				decorator.AnteHandle(ctx, tx, false, anteTerminator)
+				decorator.AnteHandle(ctx, tx, tc.simulate, anteTerminator)
 			})
 
 			return
 		}
 
 		decorator := makeBeforeTxDecorator(app)
-		_, err = decorator.AnteHandle(ctx, tx, false, anteTerminator)
+		_, err = decorator.AnteHandle(ctx, tx, tc.simulate, anteTerminator)
 
 		if tc.expOk {
 			require.NoError(t, err)
@@ -280,6 +331,7 @@ func TestAfterTx(t *testing.T) {
 		[]sdk.Msg{banktypes.NewMsgSend(absAcc.GetAddress(), acc.GetAddress(), sdk.NewCoins())},
 		keybase,
 		"test1",
+		true,
 		absAcc,
 		mockChainID,
 		absAcc.GetAccountNumber(),

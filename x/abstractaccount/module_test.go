@@ -113,13 +113,18 @@ func prepareTx(ctx sdk.Context, app *simapp.SimApp, msgs []sdk.Msg) (authsigning
 //     account-number
 func prepareTx2(
 	ctx sdk.Context, app *simapp.SimApp, msgs []sdk.Msg,
-	keybase keyring.Keyring, keyName string,
+	keybase keyring.Keyring, keyName string, sign bool,
 	absAcc *types.AbstractAccount, chainID string, accNum, seq uint64,
 ) (authsigning.Tx, error) {
 	txBuilder := app.TxConfig().NewTxBuilder()
 
 	if err := txBuilder.SetMsgs(msgs...); err != nil {
 		return nil, err
+	}
+
+	// if the tx doesn't need to be signed, we can return here
+	if !sign {
+		return txBuilder.GetTx(), nil
 	}
 
 	// round 1: set empty signature
