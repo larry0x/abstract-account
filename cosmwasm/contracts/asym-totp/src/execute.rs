@@ -22,11 +22,11 @@ pub fn init(deps: DepsMut, env: Env, cfg: &Config) -> ContractResult<Response> {
 }
 
 pub fn before_tx(
-    deps: DepsMut,
-    env: Env,
-    tx_bytes: &Binary,
+    deps:       DepsMut,
+    env:        Env,
+    tx_bytes:   &Binary,
     cred_bytes: Option<&Binary>,
-    simulate: bool,
+    simulate:   bool,
 ) -> ContractResult<Response> {
     let cfg = CONFIG.load(deps.storage)?;
 
@@ -46,6 +46,7 @@ pub fn before_tx(
     // verify signautre and OTP
     // skip if in simulation mode
     if !simulate {
+        // deserialize credential bytes
         let cred_bytes = cred_bytes.ok_or(BaseError::SignatureNotFound)?;
         let cred: Credential = from_binary(cred_bytes)?;
 

@@ -26,7 +26,6 @@ pub fn before_tx(
     // skip if in simulation mode
     if !simulate {
         let sig_bytes = sig_bytes.ok_or(BaseError::SignatureNotFound)?;
-
         crypto::verify(deps.api, tx_bytes, sig_bytes, &addr_bytes)?;
     }
 

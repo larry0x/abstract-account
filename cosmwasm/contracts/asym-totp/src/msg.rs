@@ -5,10 +5,8 @@ use cosmwasm_std::Binary;
 pub struct Config {
     /// Public key that will sign the tx
     pub pubkey: Binary,
-
     /// Public key that will sign the OTP SignDoc (defined later in this file)
     pub otp_pubkey: Binary,
-
     /// The OTP time duration, in seconds
     pub duration_secs: u64,
 }
@@ -19,11 +17,8 @@ pub struct Config {
 pub struct SignDoc {
     /// Identifies which chain this OTP is intended for
     pub chain_id: String,
-
-    /// Address of the smart contract account that this OTP is used to
-    /// authenticate
+    /// Address of the AbstractAccount that this OTP is used to authenticate
     pub account: String,
-
     /// How many OTP durations has passed since the UNIX epoch
     pub count: u64,
 }
@@ -33,7 +28,7 @@ pub struct SignDoc {
 #[cw_serde]
 pub struct Credential {
     pub signature: Binary,
-    pub otp: Binary,
+    pub otp:       Binary,
 }
 
 pub type InstantiateMsg = Config;

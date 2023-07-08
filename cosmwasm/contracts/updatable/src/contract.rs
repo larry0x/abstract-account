@@ -14,9 +14,9 @@ use crate::{execute, msg::ExecuteMsg, CONTRACT_NAME, CONTRACT_VERSION};
 #[entry_point]
 pub fn instantiate(
     deps: DepsMut,
-    _env: Env,
-    _info: MessageInfo,
-    msg: InstantiateMsg,
+    _:    Env,
+    _:    MessageInfo,
+    msg:  InstantiateMsg,
 ) -> ContractResult<Response> {
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     base::execute::init(deps.storage, &msg.pubkey)
@@ -40,9 +40,9 @@ pub fn sudo(deps: DepsMut, _env: Env, msg: AccountSudoMsg) -> ContractResult<Res
 #[entry_point]
 pub fn execute(
     deps: DepsMut,
-    env: Env,
+    env:  Env,
     info: MessageInfo,
-    msg: ExecuteMsg,
+    msg:  ExecuteMsg,
 ) -> ContractResult<Response> {
     match msg {
         ExecuteMsg::UpdatePubkey {

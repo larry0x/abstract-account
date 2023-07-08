@@ -15,9 +15,9 @@ use crate::{
 #[entry_point]
 pub fn instantiate(
     deps: DepsMut,
-    _env: Env,
-    _info: MessageInfo,
-    msg: InstantiateMsg,
+    _:    Env,
+    _:    MessageInfo,
+    msg:  InstantiateMsg,
 ) -> ContractResult<Response> {
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     execute::init(deps.storage, &msg.pubkey)
@@ -39,12 +39,7 @@ pub fn sudo(deps: DepsMut, _env: Env, msg: AccountSudoMsg) -> ContractResult<Res
 }
 
 #[entry_point]
-pub fn execute(
-    _deps: DepsMut,
-    _env: Env,
-    _info: MessageInfo,
-    _msg: Empty,
-) -> ContractResult<Response> {
+pub fn execute(_: DepsMut, _: Env, _: MessageInfo, _: Empty) -> ContractResult<Response> {
     unreachable!("this contract does not have any execute method");
 }
 

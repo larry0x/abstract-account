@@ -15,13 +15,13 @@ pub enum ContractError {
     #[error("grant found for grantee `{grantee}` and type_url `{type_url}`")]
     GrantExpired {
         type_url: String,
-        grantee: String,
+        grantee:  String,
     },
 
     #[error("no grant found for grantee `{grantee}` and type_url `{type_url}`")]
     GrantNotFound {
         type_url: String,
-        grantee: String,
+        grantee:  String,
     },
 
     #[error("cannot create a new grant that has already expired")]

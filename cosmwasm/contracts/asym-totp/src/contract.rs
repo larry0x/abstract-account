@@ -1,8 +1,9 @@
-use absacc::AccountSudoMsg;
-use account_base as base;
 use cosmwasm_std::{
     entry_point, to_binary, Binary, Deps, DepsMut, Empty, Env, MessageInfo, Response, StdResult,
 };
+
+use absacc::AccountSudoMsg;
+use account_base as base;
 
 use crate::{
     error::ContractResult,
@@ -15,9 +16,9 @@ use crate::{
 #[entry_point]
 pub fn instantiate(
     deps: DepsMut,
-    env: Env,
-    _info: MessageInfo,
-    msg: InstantiateMsg,
+    env:  Env,
+    _:    MessageInfo,
+    msg:  InstantiateMsg,
 ) -> ContractResult<Response> {
     cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     execute::init(deps, env, &msg)
@@ -39,12 +40,7 @@ pub fn sudo(deps: DepsMut, env: Env, msg: AccountSudoMsg) -> ContractResult<Resp
 }
 
 #[entry_point]
-pub fn execute(
-    _deps: DepsMut,
-    _env: Env,
-    _info: MessageInfo,
-    _msg: Empty,
-) -> ContractResult<Response> {
+pub fn execute(_: DepsMut, _: Env, _: MessageInfo, _: Empty) -> ContractResult<Response> {
     unreachable!("this contract does not have any execute method");
 }
 
