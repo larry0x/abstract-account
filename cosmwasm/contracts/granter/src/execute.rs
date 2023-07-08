@@ -44,7 +44,7 @@ pub fn before_tx(
             return Err(BaseError::SignatureNotFound.into());
         };
 
-        if !deps.api.secp256k1_verify(&tx_bytes_hash, &sig_bytes, &credential.pubkey)? {
+        if !deps.api.secp256k1_verify(&tx_bytes_hash, sig_bytes, &credential.pubkey)? {
             return Err(BaseError::InvalidSignature.into());
         }
     }
