@@ -13,10 +13,10 @@ type AccountSudoMsg struct {
 }
 
 type BeforeTx struct {
-	Msgs       []*Any `json:"msgs"`
-	TxBytes    []byte `json:"tx_bytes"`
-	Credential []byte `json:"credential,omitempty"`
-	Simulate   bool   `json:"simulate"`
+	Msgs      []*Any `json:"msgs"`
+	TxBytes   []byte `json:"tx_bytes"`
+	CredBytes []byte `json:"cred_bytes,omitempty"`
+	Simulate  bool   `json:"simulate"`
 }
 
 type AfterTx struct {

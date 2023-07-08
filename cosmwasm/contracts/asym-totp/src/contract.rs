@@ -28,10 +28,10 @@ pub fn sudo(deps: DepsMut, env: Env, msg: AccountSudoMsg) -> ContractResult<Resp
     match msg {
         AccountSudoMsg::BeforeTx {
             tx_bytes,
-            credential,
+            cred_bytes,
             simulate,
             ..
-        } => execute::before_tx(deps, env, &tx_bytes, credential.as_ref(), simulate),
+        } => execute::before_tx(deps, env, &tx_bytes, cred_bytes.as_ref(), simulate),
         AccountSudoMsg::AfterTx {
             ..
         } => base::execute::after_tx().map_err(Into::into),

@@ -109,8 +109,8 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 		BeforeTx: &types.BeforeTx{
 			Msgs:    msgAnys,
 			TxBytes: signBytes,
-			// Note that we call this field "credential" instead of signature. There
-			// is an important reason for this!
+			// Note that we call this field "cred_bytes" (credental bytes) instead of
+			// signature. There is an important reason for this!
 			//
 			// For EOAs, the credential used to prove a tx is authenticated is a
 			// cryptographic signature. For AbstractAccounts however, this is not
@@ -119,8 +119,8 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 			// this can be a zk proof that the sender has undergone certain KYC
 			// procedures. Therefore, instead of calling this "signature", we choose a
 			// more generalized term: credentials.
-			Credential: sigBytes,
-			Simulate:   simulate,
+			CredBytes: sigBytes,
+			Simulate:  simulate,
 		},
 	})
 	if err != nil {
