@@ -38,9 +38,12 @@ enum SudoMsg {
   BeforeTx {
     msgs:       Vec<Any>,
     tx_bytes:   Binary,
-    credential: Binary,
+    credential: Option<Binary>,
+    simulate:   bool,
   },
-  AfterTx {},
+  AfterTx {
+    simulate: bool,
+  },
 }
 ```
 
