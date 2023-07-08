@@ -9,20 +9,12 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
 	simapptesting "github.com/larry0x/abstract-account/simapp/testing"
 	"github.com/larry0x/abstract-account/x/abstractaccount"
 	"github.com/larry0x/abstract-account/x/abstractaccount/testdata"
 	"github.com/larry0x/abstract-account/x/abstractaccount/types"
-)
-
-const (
-	mockChainID = "dev-1"
-	mockAccNum  = uint64(12345)
-	mockSeq     = uint64(88888)
-	signMode    = signing.SignMode_SIGN_MODE_DIRECT
 )
 
 func TestIsAbstractAccountTx(t *testing.T) {
@@ -97,10 +89,16 @@ func TestIsAbstractAccountTx(t *testing.T) {
 	}
 }
 
+type BaseInstantiateMsg struct {
+	PubKey []byte `json:"pubkey"`
+}
+
 func TestBeforeTx(t *testing.T) {
 	var (
-		app     = simapptesting.MakeSimpleMockApp()
-		keybase = keyring.NewInMemory(app.Codec())
+		app        = simapptesting.MakeSimpleMockApp()
+		keybase    = keyring.NewInMemory(app.Codec())
+		mockAccNum = uint64(12345)
+		mockSeq    = uint64(88888)
 	)
 
 	ctx := app.NewContext(false, tmproto.Header{
@@ -131,7 +129,7 @@ func TestBeforeTx(t *testing.T) {
 		// use the pubkey of acc1 as the AbstractAccount's pubkey
 		acc1.GetAddress(),
 		testdata.AccountWasm,
-		&AccountInitMsg{PubKey: acc1.GetPubKey().Bytes()},
+		&BaseInstantiateMsg{PubKey: acc1.GetPubKey().Bytes()},
 		sdk.NewCoins(),
 	)
 	require.NoError(t, err)
@@ -339,7 +337,7 @@ func TestAfterTx(t *testing.T) {
 		app,
 		acc.GetAddress(),
 		testdata.AccountWasm,
-		&AccountInitMsg{PubKey: acc.GetPubKey().Bytes()},
+		&BaseInstantiateMsg{PubKey: acc.GetPubKey().Bytes()},
 		sdk.NewCoins(),
 	)
 	require.NoError(t, err)

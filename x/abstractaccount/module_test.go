@@ -22,9 +22,10 @@ import (
 	"github.com/larry0x/abstract-account/x/abstractaccount/types"
 )
 
-type AccountInitMsg struct {
-	PubKey []byte `json:"pubkey"`
-}
+const (
+	mockChainID = "dev-1"
+	signMode    = signing.SignMode_SIGN_MODE_DIRECT
+)
 
 func anteTerminator(ctx sdk.Context, tx sdk.Tx, simulate bool) (sdk.Context, error) {
 	return ctx, nil
