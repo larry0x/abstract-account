@@ -5,27 +5,29 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/larry0x/abstract-account/x/abstractaccount/types"
+
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 )
 
 // MigrateStore performs in-place params migrations of
 // BypassMinFeeMsgTypes and MaxTotalBypassMinFeeMsgGasUsage
 // from app.toml to globalfee params.
-func MigrateStore(ctx sdk.Context, store sdk.KVStore, cdc codec.BinaryCodec) error {
+func MigrateStore(ctx sdk.Context, key storetypes.StoreKey, cdc codec.BinaryCodec) error {
 	store := ctx.KVStore(key)
 
-	params := types.DefaultParams()
 	params, err := getParams(ctx, store, cdc)
 	if err != nil {
 		return err
 	}
 
-	return setParams(ctx, store, cdc, &params)
+	return setParams(ctx, store, cdc, params)
 }
 
-func getParams(ctx sdk.Context, store sdk.KVStore, cdc u.BinaryCodec) (*types.Params, error) {
+func getParams(ctx sdk.Context, store sdk.KVStore, cdc codec.BinaryCodec) (*types.Params, error) {
 	bz := store.Get(types.KeyParams)
 	if bz == nil {
-		return nil, sdkerrors.ErrNotFound.Wrap("x/abstractaccount module params")
+		params := types.DefaultParams()
+		return params, nil
 	}
 
 	var params types.Params
