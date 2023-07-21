@@ -16,10 +16,10 @@ type Migrator struct {
 
 // NewMigrator returns a new Migrator.
 func NewMigrator(key storetypes.StoreKey, cdc codec.BinaryCodec) Migrator {
-	return Migrator{key: key}
+	return Migrator{key: key, cdc: cdc}
 }
 
 // Migrate1to2 migrates from version 1 to 2.
-func (m Migrator) Migrate1to2(ctx sdk.Context, key storetypes.StoreKey) error {
-	return v2.MigrateStore(ctx, keys)
+func (m Migrator) Migrate1to2(ctx sdk.Context) error {
+	return v2.MigrateStore(ctx, m.key, m.cdc)
 }
