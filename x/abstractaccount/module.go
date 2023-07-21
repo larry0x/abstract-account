@@ -90,7 +90,7 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 }
 
 func (AppModule) ConsensusVersion() uint64 {
-	return 1
+	return 2
 }
 
 func (AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {
