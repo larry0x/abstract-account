@@ -73,11 +73,6 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 
 	// save the account address to the module store. we will need it in the
 	// posthandler
-	//
-	// TODO: a question is that instead of writing to store, can we just put this
-	// in memory instead. in practice however, the address is deleted in the post
-	// handler, so it's never actually written to disk, meaning the difference in
-	// gas consumption should be really small. still worth investigating tho.
 	d.aak.SetSignerAddress(ctx, signerAcc.GetAddress())
 
 	// check account sequence number
