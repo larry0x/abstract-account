@@ -29,10 +29,6 @@ func (ms msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdatePara
 		return nil, sdkerrors.ErrUnauthorized.Wrapf("sender is not authority: expect %s, found %s", ms.k.authority, req.Sender)
 	}
 
-	if err := req.Params.Validate(); err != nil {
-		return nil, err
-	}
-
 	if err := ms.k.SetParams(ctx, req.Params); err != nil {
 		return nil, err
 	}
