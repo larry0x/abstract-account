@@ -177,7 +177,7 @@ func (d AfterTxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate, succe
 		return ctx, err
 	}
 
-	if err := sudoWithGasLimit(ctx, d.aak.ContractKeeper(), signerAddr, sudoMsgBytes, params.MaxGasBefore); err != nil {
+	if err := sudoWithGasLimit(ctx, d.aak.ContractKeeper(), signerAddr, sudoMsgBytes, params.MaxGasAfter); err != nil {
 		return ctx, err
 	}
 
