@@ -99,6 +99,10 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, data json.
 	var gs types.GenesisState
 	cdc.MustUnmarshalJSON(data, &gs)
 
+	if err := gs.Validate(); err != nil {
+		panic(fmt.Sprintf("invalid x/%s module genesis state: %s", types.ModuleName, err.Error()))
+	}
+
 	return am.keeper.InitGenesis(ctx, &gs)
 }
 
