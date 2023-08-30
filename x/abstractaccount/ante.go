@@ -229,7 +229,7 @@ func prepareCredentials(
 
 	data, ok := sigData.(*txsigning.SingleSignatureData)
 	if !ok {
-		return nil, nil, types.ErrNotSingleSignautre
+		return nil, nil, types.ErrNotSingleSignature
 	}
 
 	signBytes, err := handler.GetSignBytes(data.SignMode, signerData, tx)
