@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -95,14 +94,13 @@ func (ms msgServer) RegisterAccount(goCtx context.Context, req *types.MsgRegiste
 		types.AttributeKeyContractAddr, contractAddr.String(),
 	)
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventTypeAccountRegistered,
-			sdk.NewAttribute(types.AttributeKeyCreator, req.Sender),
-			sdk.NewAttribute(types.AttributeKeyCodeID, strconv.FormatUint(req.CodeID, 10)),
-			sdk.NewAttribute(types.AttributeKeyContractAddr, contractAddr.String()),
-		),
-	)
+	if err = ctx.EventManager().EmitTypedEvent(&types.EventAccountRegistered{
+		Creator:      req.Sender,
+		CodeID:       req.CodeID,
+		ContractAddr: contractAddr.String(),
+	}); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgRegisterAccountResponse{Address: contractAddr.String(), Data: data}, nil
 }

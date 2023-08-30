@@ -273,6 +273,10 @@ func sudoWithGasLimit(
 	}
 
 	write()
+	// EmitEvents method is deprecated in favor EmitTypedEvent
+	// however, here we're not creating events ourselves, but rather just
+	// forwarding events emitted by another process (contractKeeper.Sudo)
+	// so we have to stick with the legacy EmitEvents here.
 	ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
 
 	return nil
