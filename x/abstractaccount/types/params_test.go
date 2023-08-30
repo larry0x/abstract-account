@@ -43,7 +43,7 @@ func TestValidateParams(t *testing.T) {
 			desc: "allow list contains zero code ID",
 			params: &types.Params{
 				AllowAllCodeIDs: false,
-				AllowedCodeIDs:  []uint64{1, 0, 3},
+				AllowedCodeIDs:  []uint64{0, 1, 2},
 				MaxGasBefore:    types.DefaultMaxGas,
 				MaxGasAfter:     types.DefaultMaxGas,
 			},

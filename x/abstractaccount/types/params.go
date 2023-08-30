@@ -34,17 +34,13 @@ func (p *Params) Validate() error {
 	}
 
 	// allowed list must contain non-zero, unique, and sorted code IDs
-	prev := uint64(0)
+	prevCodeID := uint64(0)
 	for _, codeID := range p.AllowedCodeIDs {
-		if codeID == 0 {
+		if prevCodeID >= codeID {
 			return ErrMalformedAllowList
 		}
 
-		if prev >= codeID {
-			return ErrMalformedAllowList
-		}
-
-		prev = codeID
+		prevCodeID = codeID
 	}
 
 	return nil
