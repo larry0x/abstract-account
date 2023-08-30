@@ -19,7 +19,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 
 	"github.com/larry0x/abstract-account/simapp"
 	poatypes "github.com/larry0x/simapp/x/poa/types"
@@ -57,7 +57,7 @@ func MakeMockApp(balances []banktypes.Balance) *simapp.SimApp {
 		nil,
 		true,
 		EmptyAppOptions{},
-		[]wasm.Option{},
+		[]wasmkeeper.Option{},
 	)
 
 	gs := MakeMockGenesisState(encCfg.Codec, balances)
