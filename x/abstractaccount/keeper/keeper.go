@@ -115,3 +115,8 @@ func (k Keeper) DeleteSignerAddress(ctx sdk.Context) {
 	store := ctx.KVStore(k.storeKey)
 	store.Delete(types.KeySignerAddress)
 }
+
+// ------------------------------- Migration -------------------------------
+func (k Keeper) Migrator() Migrator {
+	return NewMigrator(k.storeKey, k.cdc)
+}

@@ -81,10 +81,16 @@ func (AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServerImpl(am.keeper))
+
+	m := am.keeper.Migrator()
+	if err := cfg.RegisterMigration(types.ModuleName, 1, m.Migrate1to2); err != nil {
+		panic(fmt.Sprintf("failed to migrate x/abstract-account from version 1 to 2: %v", err))
+	}
+
 }
 
 func (AppModule) ConsensusVersion() uint64 {
-	return 1
+	return 2
 }
 
 func (AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {
