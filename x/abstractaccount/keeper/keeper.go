@@ -67,6 +67,15 @@ func (k Keeper) GetParams(ctx sdk.Context) (*types.Params, error) {
 func (k Keeper) SetParams(ctx sdk.Context, params *types.Params) error {
 	store := ctx.KVStore(k.storeKey)
 
+	// params must be valid before we save it
+	// there are two instances where SetParams is called - in Keeper.InitGenesis,
+	// and in msgServer.UpdateParams
+	// we can either perform the validation in those two functions, or do it
+	// together here. doing it here seems cleaner.
+	if err := params.Validate(); err != nil {
+		return err
+	}
+
 	bz, err := k.cdc.Marshal(params)
 	if err != nil {
 		return types.ErrParsingParams.Wrap(err.Error())
