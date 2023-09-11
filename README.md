@@ -182,7 +182,7 @@ This repository contains three SCAs for demo purpose. Note, they are not conside
 
 ## License
 
-(c) larry0x, 2023 - [All rights reserved](./LICENSE).
+[Apache-2.0](./LICENSE)
 
 [1]: https://cosmwasm.com/
 [2]: https://eips.ethereum.org/EIPS/eip-2938
