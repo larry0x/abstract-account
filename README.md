@@ -154,7 +154,7 @@ The decorator firstly determines whether the tx's signer is an SCA. If this is t
 
 For PostHandler, we append a new [`AfterTxDecorator`][8], where the SCA's `after_tx` method is called.
 
-That's it - AA isn't complicated, and we don't break any existing thing. To sum it up: *two new sudo methods on the contract side, two new Ante/PostHandler decorators on the state machine side*.
+That's it - AA isn't complicated, and we don't break any existing thing. To sum it up: _two new sudo methods on the contract side, two new Ante/PostHandler decorators on the state machine side_.
 
 ## Parameters
 
