@@ -25,7 +25,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 
-	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 
 	"github.com/larry0x/abstract-account/simapp"
 )
@@ -237,7 +237,7 @@ func createApp(
 		traceStore,
 		true,
 		appOpts,
-		[]wasm.Option{},
+		[]wasmkeeper.Option{},
 		server.DefaultBaseappOptions(appOpts)...,
 	)
 }

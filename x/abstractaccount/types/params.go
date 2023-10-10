@@ -28,6 +28,21 @@ func (p *Params) Validate() error {
 		return ErrZeroMaxGas
 	}
 
+	// if all code IDs are allowed, then the allowed list must be empty
+	if p.AllowAllCodeIDs && len(p.AllowedCodeIDs) != 0 {
+		return ErrNonEmptyAllowList
+	}
+
+	// allowed list must contain non-zero, unique, and sorted code IDs
+	prevCodeID := uint64(0)
+	for _, codeID := range p.AllowedCodeIDs {
+		if prevCodeID >= codeID {
+			return ErrMalformedAllowList
+		}
+
+		prevCodeID = codeID
+	}
+
 	return nil
 }
 

@@ -1,0 +1,12 @@
+syntax = "proto3";
+package abstractaccount.v1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/larry0x/abstract-account/x/abstractaccount/types";
+
+message EventAccountRegistered {
+  string creator       = 1;
+  uint64 code_id       = 2 [(gogoproto.customname) = "CodeID"];
+  string contract_addr = 3;
+}
