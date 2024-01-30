@@ -73,11 +73,6 @@ func (d BeforeTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool,
 
 	// save the account address to the module store. we will need it in the
 	// posthandler
-	//
-	// TODO: a question is that instead of writing to store, can we just put this
-	// in memory instead. in practice however, the address is deleted in the post
-	// handler, so it's never actually written to disk, meaning the difference in
-	// gas consumption should be really small. still worth investigating tho.
 	d.aak.SetSignerAddress(ctx, signerAcc.GetAddress())
 
 	// check account sequence number
@@ -177,7 +172,7 @@ func (d AfterTxDecorator) PostHandle(ctx sdk.Context, tx sdk.Tx, simulate, succe
 		return ctx, err
 	}
 
-	if err := sudoWithGasLimit(ctx, d.aak.ContractKeeper(), signerAddr, sudoMsgBytes, params.MaxGasBefore); err != nil {
+	if err := sudoWithGasLimit(ctx, d.aak.ContractKeeper(), signerAddr, sudoMsgBytes, params.MaxGasAfter); err != nil {
 		return ctx, err
 	}
 
@@ -229,7 +224,7 @@ func prepareCredentials(
 
 	data, ok := sigData.(*txsigning.SingleSignatureData)
 	if !ok {
-		return nil, nil, types.ErrNotSingleSignautre
+		return nil, nil, types.ErrNotSingleSignature
 	}
 
 	signBytes, err := handler.GetSignBytes(data.SignMode, signerData, tx)
@@ -273,6 +268,10 @@ func sudoWithGasLimit(
 	}
 
 	write()
+	// EmitEvents method is deprecated in favor EmitTypedEvent
+	// however, here we're not creating events ourselves, but rather just
+	// forwarding events emitted by another process (contractKeeper.Sudo)
+	// so we have to stick with the legacy EmitEvents here.
 	ctx.EventManager().EmitEvents(cacheCtx.EventManager().Events())
 
 	return nil

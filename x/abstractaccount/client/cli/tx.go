@@ -12,8 +12,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-
 	"github.com/larry0x/abstract-account/x/abstractaccount/types"
 )
 
@@ -61,11 +59,6 @@ func registerCmd() *cobra.Command {
 				return fmt.Errorf("salt: %s", err)
 			}
 
-			saltBytes := []byte(salt)
-			if err = wasmtypes.ValidateSalt(saltBytes); err != nil {
-				return fmt.Errorf("salt: %s", err)
-			}
-
 			amountStr, err := cmd.Flags().GetString(flagFunds)
 			if err != nil {
 				return fmt.Errorf("amount: %s", err)
@@ -81,7 +74,7 @@ func registerCmd() *cobra.Command {
 				CodeID: codeID,
 				Msg:    []byte(args[1]),
 				Funds:  amount,
-				Salt:   saltBytes,
+				Salt:   []byte(salt),
 			}
 
 			if err := msg.ValidateBasic(); err != nil {

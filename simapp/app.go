@@ -87,7 +87,7 @@ var (
 
 	maccPerms = map[string][]string{
 		authtypes.FeeCollectorName: nil,
-		wasm.ModuleName:            {authtypes.Burner},
+		wasmtypes.ModuleName:       {authtypes.Burner},
 	}
 )
 
@@ -112,7 +112,7 @@ type SimApp struct {
 	AccountKeeper         authkeeper.AccountKeeper
 	BankKeeper            bankkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
-	WasmKeeper            wasm.Keeper
+	WasmKeeper            wasmkeeper.Keeper
 
 	ModuleManager *module.Manager
 	configurator  module.Configurator
@@ -133,7 +133,7 @@ func NewSimApp(
 	traceStore io.Writer,
 	loadLatest bool,
 	appOpts servertypes.AppOptions,
-	wasmOpts []wasm.Option,
+	wasmOpts []wasmkeeper.Option,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *SimApp {
 	encCfg := MakeEncodingConfig()
@@ -156,7 +156,7 @@ func NewSimApp(
 		authtypes.StoreKey,
 		banktypes.StoreKey,
 		consensusparamtypes.StoreKey,
-		wasm.StoreKey,
+		wasmtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys()
 	memKeys := sdk.NewMemoryStoreKeys()
@@ -197,9 +197,9 @@ func NewSimApp(
 	)
 
 	wasmDir, wasmCfg, wasmCapabilities := wasmParams(appOpts)
-	app.WasmKeeper = wasm.NewKeeper(
+	app.WasmKeeper = wasmkeeper.NewKeeper(
 		app.cdc,
-		keys[wasm.StoreKey],
+		keys[wasmtypes.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
 		nil,
@@ -243,7 +243,7 @@ func NewSimApp(
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		consensusparamtypes.ModuleName,
-		wasm.ModuleName,
+		wasmtypes.ModuleName,
 		abstractaccounttypes.ModuleName,
 	)
 
@@ -252,7 +252,7 @@ func NewSimApp(
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		consensusparamtypes.ModuleName,
-		wasm.ModuleName,
+		wasmtypes.ModuleName,
 		abstractaccounttypes.ModuleName,
 	)
 
@@ -261,7 +261,7 @@ func NewSimApp(
 		banktypes.ModuleName,
 		poatypes.ModuleName,
 		consensusparamtypes.ModuleName,
-		wasm.ModuleName,
+		wasmtypes.ModuleName,
 		abstractaccounttypes.ModuleName,
 	}
 	app.ModuleManager.SetOrderInitGenesis(genesisModuleOrder...)
@@ -278,7 +278,7 @@ func NewSimApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 
-	app.setAnteHandler(encCfg.TxConfig, wasmCfg, keys[wasm.StoreKey])
+	app.setAnteHandler(encCfg.TxConfig, wasmCfg, keys[wasmtypes.StoreKey])
 	app.setPostHandler()
 
 	if manager := app.SnapshotManager(); manager != nil {
