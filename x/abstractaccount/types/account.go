@@ -77,6 +77,14 @@ func (acc *AbstractAccount) SetSequence(seq uint64) error {
 	return nil
 }
 
+func (acc *AbstractAccount) Validate() error {
+	if len(acc.Address) == 0 {
+		return errors.New("address cannot be empty")
+	}
+
+	return nil
+}
+
 // --------------------------------- NilPubKey ---------------------------------
 
 func NewNilPubKey(bz []byte) *NilPubKey {
