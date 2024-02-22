@@ -187,7 +187,7 @@ This repository contains three SCAs for demo purpose. Note, they are not conside
 [1]: https://cosmwasm.com/
 [2]: https://eips.ethereum.org/EIPS/eip-2938
 [3]: https://docs.cosmos.network/v0.46/building-modules/intro.html
-[4]: https://github.com/larry0x/abstract-account/blob/main/cosmwasm/packages/abstract-account/src/lib.rs#L13-L32
+[4]: https://github.com/larry0x/abstract-account/blob/81da976583b4cc2ef49823d88fa3f393cb5449f6/cosmwasm/packages/absacc/src/lib.rs#L15-L43
 [5]: https://github.com/cosmos/cosmos-sdk/blob/v0.47.2/x/auth/ante/ante.go#L38-L51
 [6]: https://github.com/cosmos/cosmos-sdk/blob/v0.47.2/x/auth/ante/sigverify.go#L202-L205
 [7]: https://github.com/larry0x/abstract-account/blob/main/x/abstractaccount/ante.go#L46-L128
