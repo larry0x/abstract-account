@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
-
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/larry0x/abstract-account/x/abstractaccount/types"
 )
 
@@ -24,7 +24,7 @@ func GetQueryCmd() *cobra.Command {
 }
 
 func paramsCmd() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "params",
 		Short: "Query the module's parameters",
 		Args:  cobra.NoArgs,
@@ -45,4 +45,8 @@ func paramsCmd() *cobra.Command {
 			return clientCtx.PrintProto(res.Params)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
 }
