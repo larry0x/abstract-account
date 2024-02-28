@@ -1,21 +1,13 @@
-(c) larry0x, 2023
+Copyright 2023 larry0x
 
-Unless otherwise indicated, (a) all materials (including all source code,
-designs, and protocols) contained in this repository have been published for
-informational purposes only; (b) no license, right of reproduction,
-distribution, or other right with respect thereto is granted or implied; and
-(c) all moral, intellectual property, and other rights are hereby reserved by
-the copyright holder.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-THE SOFTWARE AND INTELLECTUAL PROPERTY INCLUDED IN THIS REPOSITORY IS PROVIDED
-BY THE COPYRIGHT HOLDERS "AS IS," AND ANY EXPRESS OR IMPLIED WARRANTIES,
-INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED. IN NO EVENT SHALL THE
-COPYRIGHT HOLDER BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE OR INTELLECTUAL PROPERTY (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-INTERRUPTION) HOWEVER CAUSED OR CLAIMED (WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)), EVEN IF SUCH DAMAGES WERE
-REASONABLY FORESEEABLE OR THE COPYRIGHT HOLDERS WERE ADVISED OF THE POSSIBILITY
-OF SUCH DAMAGE.
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

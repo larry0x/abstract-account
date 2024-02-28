@@ -154,7 +154,7 @@ The decorator firstly determines whether the tx's signer is an SCA. If this is t
 
 For PostHandler, we append a new [`AfterTxDecorator`][8], where the SCA's `after_tx` method is called.
 
-That's it - AA isn't complicated, and we don't break any existing thing. To sum it up: *two new sudo methods on the contract side, two new Ante/PostHandler decorators on the state machine side*.
+That's it - AA isn't complicated, and we don't break any existing thing. To sum it up: _two new sudo methods on the contract side, two new Ante/PostHandler decorators on the state machine side_.
 
 ## Parameters
 
@@ -182,12 +182,12 @@ This repository contains three SCAs for demo purpose. Note, they are not conside
 
 ## License
 
-(c) larry0x, 2023 - [All rights reserved](./LICENSE).
+[Apache-2.0](./LICENSE)
 
 [1]: https://cosmwasm.com/
 [2]: https://eips.ethereum.org/EIPS/eip-2938
 [3]: https://docs.cosmos.network/v0.46/building-modules/intro.html
-[4]: https://github.com/larry0x/abstract-account/blob/main/cosmwasm/packages/abstract-account/src/lib.rs#L13-L32
+[4]: https://github.com/larry0x/abstract-account/blob/81da976583b4cc2ef49823d88fa3f393cb5449f6/cosmwasm/packages/absacc/src/lib.rs#L15-L43
 [5]: https://github.com/cosmos/cosmos-sdk/blob/v0.47.2/x/auth/ante/ante.go#L38-L51
 [6]: https://github.com/cosmos/cosmos-sdk/blob/v0.47.2/x/auth/ante/sigverify.go#L202-L205
 [7]: https://github.com/larry0x/abstract-account/blob/main/x/abstractaccount/ante.go#L46-L128
