@@ -7,6 +7,7 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 var amino = codec.NewLegacyAmino()
@@ -36,6 +37,10 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 
 func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.AccountI)(nil), &AbstractAccount{})
+	registry.RegisterImplementations(
+		(*authtypes.GenesisAccount)(nil),
+		&AbstractAccount{},
+	)
 	registry.RegisterImplementations((*cryptotypes.PubKey)(nil), &NilPubKey{})
 
 	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgRegisterAccount{})
